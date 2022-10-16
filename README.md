@@ -1,5 +1,7 @@
 ![Header](images/header.png)
 
+<div align="center">
+
 ![Java 17](https://img.shields.io/badge/Language-Java%2017-9B599A.svg?style=plastic)
 ![License](https://img.shields.io/github/license/Doraadams/Colorfly?style=plastic)
 ![Environment: Client](https://img.shields.io/badge/Environment-Client-1976d2?style=plastic)
@@ -21,6 +23,7 @@ Colorflies will spawn in semi large groups in certain biomes, so be on the looko
 #### Keep an eye out for the rare Blue Ghost Colorfly! They seem to have recently settled into dark and forested regions...
 
 ## Screenshots
+</div>
 
 ![Image1](images/1.png)\
 ![Image2](images/2.png)\
