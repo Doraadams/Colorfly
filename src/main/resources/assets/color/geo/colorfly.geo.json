@@ -1,0 +1,77 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.colorfly",
+				"texture_width": 16,
+				"texture_height": 16,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 1.5,
+				"visible_bounds_offset": [0, 0.25, 0]
+			},
+			"bones": [
+				{
+					"name": "Colorfly",
+					"pivot": [0, 0.25, -0.25]
+				},
+				{
+					"name": "Anim",
+					"parent": "Colorfly",
+					"pivot": [0, 0.25, -0.225],
+					"cubes": [
+						{
+							"origin": [-0.25, 0, 0],
+							"size": [0.5, 0.5, 0.5],
+							"uv": {
+								"north": {"uv": [2, 0], "uv_size": [1, 1]},
+								"east": {"uv": [1, 2], "uv_size": [1, 1]},
+								"south": {"uv": [2, 1], "uv_size": [1, 1]},
+								"west": {"uv": [2, 2], "uv_size": [1, 1]},
+								"up": {"uv": [0, 3], "uv_size": [1, 1]},
+								"down": {"uv": [3, 1], "uv_size": [1, -1]}
+							}
+						}
+					]
+				},
+				{
+					"name": "Inner",
+					"parent": "Colorfly",
+					"pivot": [0, 0.25, -0.25],
+					"cubes": [
+						{
+							"origin": [-0.25, 0, -0.5],
+							"size": [0.5, 0.5, 0.5],
+							"uv": {
+								"north": {"uv": [2, 0], "uv_size": [1, 1]},
+								"east": {"uv": [1, 2], "uv_size": [1, 1]},
+								"south": {"uv": [2, 1], "uv_size": [1, 1]},
+								"west": {"uv": [2, 2], "uv_size": [1, 1]},
+								"up": {"uv": [0, 3], "uv_size": [1, 1]},
+								"down": {"uv": [3, 1], "uv_size": [1, -1]}
+							}
+						}
+					]
+				},
+				{
+					"name": "Outer",
+					"parent": "Colorfly",
+					"pivot": [0, 0.25, 0.25],
+					"cubes": [
+						{
+							"origin": [-0.2475, 0.0025, 0.0025],
+							"size": [0.495, 0.495, 0.495],
+							"uv": {
+								"east": {"uv": [0, 0], "uv_size": [1, 1]},
+								"south": {"uv": [0, 1], "uv_size": [1, 1]},
+								"west": {"uv": [1, 0], "uv_size": [1, 1]},
+								"up": {"uv": [1, 1], "uv_size": [1, 1]},
+								"down": {"uv": [0, 3], "uv_size": [1, -1]}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

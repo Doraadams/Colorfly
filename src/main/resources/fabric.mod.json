@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "color",
+  "version": "${version}",
+
+  "name": "Colorfly",
+  "description": "When you're lost in the darkness, look for the light",
+  "authors": [
+    "localhost"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+
+  "license": "MIT License",
+  "icon": "assets/modid/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.local.color.Colorfly"
+    ],
+    "client": [
+      "net.local.color.ColorflyClient"
+    ]
+  },
+  "mixins": [
+    "color.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.6",
+    "fabric": "*",
+    "minecraft": "~1.19",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

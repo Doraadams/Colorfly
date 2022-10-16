@@ -1,0 +1,12 @@
+{
+  "item.color.colorfly_spawn_egg": "Colorfly Spawn Egg",
+  "item.color.firefly_spawn_egg": "Firefly Spawn Egg",
+
+  "item.color.green_colorfly_bottle": "Green Colorfly Bottle",
+  "item.color.blue_colorfly_bottle": "Blue Colorfly Bottle",
+
+  "block.color.greenfly_lamp": "Greenfly Lamp",
+  "block.color.bluefly_lamp": "Bluefly Lamp",
+
+  "itemGroup.color.colorfly": "Colorfly Tab"
+}

@@ -1,0 +1,6 @@
+{
+	"parent": "color:block/colorfly_lamp",
+	"textures": {
+		"2": "color:block/bluefly_lamp"
+	}
+}

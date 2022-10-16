@@ -1,0 +1,59 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.colorfly.idle": {
+			"loop": true,
+			"animation_length": 4
+		},
+		"animation.colorfly.dot": {
+			"animation_length": 0.5,
+			"bones": {
+				"Anim": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutQuint"
+						},
+						"0.0417": {
+							"vector": [0, 0, -0.5],
+							"easing": "easeInQuad"
+						},
+						"0.2083": {
+							"vector": [0, 0, -0.5],
+							"easing": "easeOutQuint"
+						},
+						"0.25": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutQuint"
+						}
+					}
+				}
+			}
+		},
+		"animation.colorfly.dash": {
+			"animation_length": 2,
+			"bones": {
+				"Anim": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutQuint"
+						},
+						"0.0417": {
+							"vector": [0, 0, -0.5]
+						},
+						"0.9583": {
+							"vector": [0, 0, -0.5],
+							"easing": "easeOutQuint"
+						},
+						"1.0": {
+							"vector": [0, 0, 0],
+							"easing": "easeOutQuint"
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}
