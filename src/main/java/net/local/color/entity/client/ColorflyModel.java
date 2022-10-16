@@ -5,6 +5,7 @@ import net.local.color.entity.custom.ColorflyEntity;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 import net.minecraft.util.Identifier;
 
+//Colorfly Model Resource Directories/Variables
 public class ColorflyModel extends AnimatedGeoModel<ColorflyEntity> {
     @Override
     public Identifier getModelResource(ColorflyEntity object) {

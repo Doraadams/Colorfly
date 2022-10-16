@@ -10,6 +10,8 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class ModEntities {
+
+    //Colorfly Entity Creation, Hitbox, & Other.
     public static final EntityType<ColorflyEntity> COLORFLY = Registry.register(
             Registry.ENTITY_TYPE, new Identifier(Colorfly.MOD_ID, "colorfly"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ColorflyEntity::new)

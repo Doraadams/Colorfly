@@ -30,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
 public class BlueflyLampBlock extends Block implements Waterloggable {
     public static final IntProperty LIT = IntProperty.of("lit",2,8);
     public static final IntProperty LEVEL = IntProperty.of("level", 0, 1);
-
     public static final BooleanProperty HANGING;
     public static final BooleanProperty WATERLOGGED;
     protected static final VoxelShape STANDING_SHAPE;

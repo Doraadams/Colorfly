@@ -8,7 +8,10 @@ import net.local.color.entity.ModEntities;
 import net.local.color.entity.client.ColorflyRenderer;
 import net.minecraft.client.render.RenderLayer;
 
+//Colorfly Client Initialize
 public class ColorflyClient implements ClientModInitializer {
+
+    //On Initialize, Register Entity || Translucent Block Model Layer
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.register(ModEntities.COLORFLY, ColorflyRenderer::new);

@@ -10,6 +10,8 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.BiomeKeys;
 
 public class ModEntitySpawn {
+
+    //Colorfly Custom Spawn Data/Restrictions
     public static void addEntitySpawn() {
         BiomeModifications.addSpawn(BiomeSelectors.includeByKey(BiomeKeys.LUSH_CAVES),
                 SpawnGroup.CREATURE, ModEntities.COLORFLY, 2000, 10, 20);

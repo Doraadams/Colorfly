@@ -16,6 +16,7 @@ import net.minecraft.util.registry.Registry;
 
 public class ModBlocks {
 
+    //Custom Block Register
     public static final Block GREENFLY_LAMP = registerBlock("greenfly_lamp",
             new GreenflyLampBlock(FabricBlockSettings.of(Material.STONE).strength(4f).requiresTool()
                     .luminance(state -> state.get(GreenflyLampBlock.LIT))), ModItemGroup.COLORFLY);
@@ -24,6 +25,7 @@ public class ModBlocks {
             new BlueflyLampBlock(FabricBlockSettings.of(Material.STONE).strength(4f).requiresTool()
                     .luminance(state -> state.get(BlueflyLampBlock.LIT))), ModItemGroup.COLORFLY);
 
+    //General Block Register
     private static Block registerBlockWithoutItem(String name, Block block) {
         return Registry.register(Registry.BLOCK, new Identifier(Colorfly.MOD_ID, name), block);
     }

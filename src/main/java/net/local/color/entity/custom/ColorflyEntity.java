@@ -41,7 +41,6 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
-
 import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -49,7 +48,7 @@ import java.util.Set;
 
 //Colorfly class w/ animation call
 public class ColorflyEntity extends TameableEntity implements IAnimatable {
-    private AnimationFactory factory = new AnimationFactory(this);
+    private final AnimationFactory factory = new AnimationFactory(this);
     private static final Set<Item> TAMING_INGREDIENTS;
     private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
     private static final TrackedData<Byte> CHILL;
@@ -115,6 +114,7 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
     }
 
     // Colorfly Goals
+    @SuppressWarnings("rawtypes")
     protected void initGoals() {
         this.goalSelector.add(0, new EscapeDangerGoal(this, 1));
         this.goalSelector.add(0, new SwimGoal(this));
@@ -147,7 +147,7 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
         public void tick() {
             if (this.colorfly.getTarget() == null) {
                 Vec3d vec3d = this.colorfly.getVelocity();
-                this.colorfly.setYaw(-((float)MathHelper.atan2(vec3d.x, vec3d.z)) * 57.295776F);
+                this.colorfly.setYaw(-((float)MathHelper.atan2(vec3d.y, vec3d.z)) * 57.295776F);
                 this.colorfly.bodyYaw = this.colorfly.getYaw();
             } else {
                 LivingEntity livingEntity = this.colorfly.getTarget();
@@ -161,7 +161,6 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
 
         }
     }
-
     public static class SafeGoal extends FlyGoal {
         public SafeGoal (PathAwareEntity pathAwareEntity, double d) {
             super(pathAwareEntity, d);
@@ -245,22 +244,14 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
                 this.setChill(true);
             }
         }
-
-        if (this.random.nextInt(100) == 0 && !this.isInLove()) {
-            this.setLoveTicks(600);
-        } else {
-            this.setLoveTicks(getLoveTicks()-1);
-        }
     }
 
     // Animation code
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        //event.isMoving()
         event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.idle", true));
         return PlayState.CONTINUE;
     }
-
-    private PlayState blinkPredicate(AnimationEvent event) {
+    private PlayState blinkPredicate(@SuppressWarnings("rawtypes") AnimationEvent event) {
         if (!this.isNob() && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
             if (this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null) { return PlayState.CONTINUE; }
             else {
@@ -287,13 +278,12 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
         }
         return PlayState.CONTINUE;
     }
-
+    @SuppressWarnings("rawtypes")
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController(this,"controller",5,this::predicate));
         animationData.addAnimationController(new AnimationController(this,"blinkController",5,this::blinkPredicate));
     }
-
     public AnimationFactory getFactory() {
         return factory;
     }
@@ -301,15 +291,12 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
     // Variant Code
     private static final TrackedData<Integer> DATA_ID_TYPE_VARIANT =
             DataTracker.registerData(ColorflyEntity.class, TrackedDataHandlerRegistry.INTEGER);
-
     public ColorflyVariant getVariant() {
         return ColorflyVariant.byId(this.getTypeVariant() & 255);
     }
-
     private int getTypeVariant() {
         return this.dataTracker.get(DATA_ID_TYPE_VARIANT);
     }
-
     private void setVariant(ColorflyVariant variant) {
         this.dataTracker.set(DATA_ID_TYPE_VARIANT, variant.getId() & 255);
     }
@@ -342,7 +329,6 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
     protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {return dimensions.height * 0.1F;}
 
     //Static Variables
-
     static {
         TAMING_INGREDIENTS = Sets.newHashSet(Items.GLASS_BOTTLE);
         GENDER = DataTracker.registerData(ColorflyEntity.class, TrackedDataHandlerRegistry.BYTE);

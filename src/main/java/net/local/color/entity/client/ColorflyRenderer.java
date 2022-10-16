@@ -16,8 +16,10 @@ import software.bernie.geckolib3.renderers.geo.layer.LayerGlowingAreasGeo;
 
 import java.util.Map;
 
+// Colorfly Rendering
 public class ColorflyRenderer extends GeoEntityRenderer <ColorflyEntity> {
 
+    //Get Variant Variable & Assign Texture Directory
     public static final Map<ColorflyVariant, Identifier> LOCATION_BY_VARIANT =
             Util.make(Maps.newEnumMap(ColorflyVariant.class), (map) -> {
                 map.put(ColorflyVariant.GREEN,
@@ -26,6 +28,7 @@ public class ColorflyRenderer extends GeoEntityRenderer <ColorflyEntity> {
                         new Identifier(Colorfly.MOD_ID, "textures/entity/colorfly_texture_blue.png"));
             });
 
+    // Render Factory, Shadow Radius, and Emissive Initialize
     public ColorflyRenderer(EntityRendererFactory.Context ctx) {
         super(ctx, new ColorflyModel());
         this.shadowRadius=0;
@@ -33,22 +36,19 @@ public class ColorflyRenderer extends GeoEntityRenderer <ColorflyEntity> {
                     RenderLayer::getEyes));
     }
 
+    // Get Model & Texture Directory
     public Identifier getModelLocation(ColorflyEntity entity) {
         return this.modelProvider.getModelResource(entity);
     }
-
     @Override
-    public Identifier getTextureResource(ColorflyEntity instance) {
-        return LOCATION_BY_VARIANT.get(instance.getVariant());
-    }
+    public Identifier getTextureResource(ColorflyEntity instance) { return LOCATION_BY_VARIANT.get(instance.getVariant()); }
 
+    // RenderType, Entity Scale, and Translucent/Opaque Layer
     @Override
     public RenderLayer getRenderType(ColorflyEntity animatable, float partialTicks, MatrixStack stack,
                                      VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder,
                                      int packedLightIn, Identifier textureLocation) {
         stack.scale(0.75f, 0.75f, 0.75f);
-
         return RenderLayer.getEntityTranslucent(this.getTextureLocation(animatable));
     }
 }
-
