@@ -1,8 +1,8 @@
 package net.local.color.entity.custom;
 
 // imported packages
+
 import com.google.common.collect.Sets;
-import net.local.color.entity.variant.ColorflyVariant;
 import net.local.color.item.ModItems;
 import net.minecraft.block.*;
 import net.minecraft.entity.*;
@@ -18,7 +18,10 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
-import net.minecraft.entity.passive.*;
+import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.entity.passive.FrogEntity;
+import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,7 +35,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.*;
+import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import software.bernie.geckolib3.core.AnimationState;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -47,24 +53,23 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
 
-//Colorfly class w/ animation call
-public class ColorflyEntity extends TameableEntity implements IAnimatable {
-    private AnimationFactory factory = new AnimationFactory(this);
+//Greenfly class w/ animation call
+public class GreenflyEntity extends TameableEntity implements IAnimatable {
+    private final AnimationFactory factory = new AnimationFactory(this);
     private static final Set<Item> TAMING_INGREDIENTS;
     private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
     private static final TrackedData<Byte> CHILL;
     private static final TrackedData<Byte> GENDER;
     private static boolean WAIT = false;
 
-    // Initialize Colorfly
-    public ColorflyEntity(EntityType<? extends TameableEntity> entityType, World world) {
+    // Initialize Greenfly
+    public GreenflyEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
         this.moveControl = new FlightMoveControl(this, 10, false);
     }
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(DATA_ID_TYPE_VARIANT, 0);
         this.dataTracker.startTracking(CHILL, (byte)0);
         this.dataTracker.startTracking(GENDER, (byte)0);
     }
@@ -73,14 +78,12 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(CHILL, nbt.getByte("Chill"));
         this.dataTracker.set(GENDER, nbt.getByte("Gender"));
-        this.dataTracker.set(DATA_ID_TYPE_VARIANT, nbt.getInt("Variant"));
     }
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putByte("Chill", this.dataTracker.get(CHILL));
         nbt.putByte("Gender", this.dataTracker.get(GENDER));
-        nbt.putInt("Variant", this.getTypeVariant());
     }
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty,
@@ -89,15 +92,13 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
         int nxt = Random.create().nextInt(9);
         this.setSilent(true);
         if ( nxt > 0) {
-            setVariant(ColorflyVariant.byId(0));
             if (this.random.nextInt(9) >= 5) {
                 this.setNob(true);
             } else {
                 this.setNob(false);
             }
-        } else {
-            setVariant(ColorflyVariant.byId(1));
         }
+
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
     @Nullable
@@ -106,7 +107,7 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
         return null;
     }
 
-    // Colorfly Attributes
+    // Greenfly Attributes
     public static DefaultAttributeContainer.Builder setAttributes() {
         return MobEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 1.0)
@@ -114,24 +115,25 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15);
     }
 
-    // Colorfly Goals
+    // Greenfly Goals
+    @SuppressWarnings("rawtypes")
     protected void initGoals() {
         this.goalSelector.add(0, new EscapeDangerGoal(this, 1));
         this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new ColorflyEntity.LookAtTargetGoal(this));
+        this.goalSelector.add(1, new GreenflyEntity.LookAtTargetGoal(this));
         this.goalSelector.add(2, new FleeEntityGoal(this, FrogEntity.class, 3.0F, 1, 1));
         this.goalSelector.add(2, new FleeEntityGoal(this, PlayerEntity.class, 3.0F, 1, 1));
         this.goalSelector.add(3, new WanderAroundFarGoal(this, 0.5));
         this.goalSelector.add(3, new FlyGoal(this, 1));
-        this.goalSelector.add(5, new ColorflyEntity.SafeGoal(this, 1));
+        this.goalSelector.add(5, new GreenflyEntity.SafeGoal(this, 1));
     }
 
-    // Colorfly Custom Goals
+    // Greenfly Custom Goals
     static class LookAtTargetGoal extends Goal {
-        private final ColorflyEntity colorfly;
+        private final GreenflyEntity greenfly;
 
-        public LookAtTargetGoal(ColorflyEntity colorfly) {
-            this.colorfly = colorfly;
+        public LookAtTargetGoal(GreenflyEntity greenfly) {
+            this.greenfly = greenfly;
             this.setControls(EnumSet.of(Control.LOOK));
         }
 
@@ -145,23 +147,22 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
         }
 
         public void tick() {
-            if (this.colorfly.getTarget() == null) {
-                Vec3d vec3d = this.colorfly.getVelocity();
-                this.colorfly.setYaw(-((float)MathHelper.atan2(vec3d.x, vec3d.z)) * 57.295776F);
-                this.colorfly.bodyYaw = this.colorfly.getYaw();
+            if (this.greenfly.getTarget() == null) {
+                Vec3d vec3d = this.greenfly.getVelocity();
+                this.greenfly.setYaw(-((float)MathHelper.atan2(vec3d.y, vec3d.z)) * 57.295776F);
+                this.greenfly.bodyYaw = this.greenfly.getYaw();
             } else {
-                LivingEntity livingEntity = this.colorfly.getTarget();
-                if (livingEntity.squaredDistanceTo(this.colorfly) < 4096.0) {
-                    double e = livingEntity.getX() - this.colorfly.getX();
-                    double f = livingEntity.getZ() - this.colorfly.getZ();
-                    this.colorfly.setYaw(-((float)MathHelper.atan2(e, f)) * 57.295776F);
-                    this.colorfly.bodyYaw = this.colorfly.getYaw();
+                LivingEntity livingEntity = this.greenfly.getTarget();
+                if (livingEntity.squaredDistanceTo(this.greenfly) < 4096.0) {
+                    double e = livingEntity.getX() - this.greenfly.getX();
+                    double f = livingEntity.getZ() - this.greenfly.getZ();
+                    this.greenfly.setYaw(-((float)MathHelper.atan2(e, f)) * 57.295776F);
+                    this.greenfly.bodyYaw = this.greenfly.getYaw();
                 }
             }
 
         }
     }
-
     public static class SafeGoal extends FlyGoal {
         public SafeGoal (PathAwareEntity pathAwareEntity, double d) {
             super(pathAwareEntity, d);
@@ -245,22 +246,14 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
                 this.setChill(true);
             }
         }
-
-        if (this.random.nextInt(100) == 0 && !this.isInLove()) {
-            this.setLoveTicks(600);
-        } else {
-            this.setLoveTicks(getLoveTicks()-1);
-        }
     }
 
     // Animation code
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        //event.isMoving()
         event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.idle", true));
         return PlayState.CONTINUE;
     }
-
-    private PlayState blinkPredicate(AnimationEvent event) {
+    private PlayState blinkPredicate(@SuppressWarnings("rawtypes") AnimationEvent event) {
         if (!this.isNob() && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
             if (this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null) { return PlayState.CONTINUE; }
             else {
@@ -287,46 +280,23 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
         }
         return PlayState.CONTINUE;
     }
-
+    @SuppressWarnings("rawtypes")
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController(this,"controller",5,this::predicate));
         animationData.addAnimationController(new AnimationController(this,"blinkController",5,this::blinkPredicate));
     }
-
     public AnimationFactory getFactory() {
         return factory;
-    }
-
-    // Variant Code
-    private static final TrackedData<Integer> DATA_ID_TYPE_VARIANT =
-            DataTracker.registerData(ColorflyEntity.class, TrackedDataHandlerRegistry.INTEGER);
-
-    public ColorflyVariant getVariant() {
-        return ColorflyVariant.byId(this.getTypeVariant() & 255);
-    }
-
-    private int getTypeVariant() {
-        return this.dataTracker.get(DATA_ID_TYPE_VARIANT);
-    }
-
-    private void setVariant(ColorflyVariant variant) {
-        this.dataTracker.set(DATA_ID_TYPE_VARIANT, variant.getId() & 255);
     }
 
     // Interaction Code
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack itemStack = player.getStackInHand(hand);
-        if (!this.world.isClient && this.getTypeVariant() == 0 && TAMING_INGREDIENTS.contains(itemStack.getItem())) {
+        if (!this.world.isClient && TAMING_INGREDIENTS.contains(itemStack.getItem())) {
             itemStack.decrement(1);
-            this.remove(Entity.RemovalReason.DISCARDED);
-            player.giveItemStack(new ItemStack(ModItems.GREEN_COLORFLY_BOTTLE,1));
-
-            return ActionResult.SUCCESS;
-        } else if (!this.world.isClient && this.getTypeVariant() == 1 && TAMING_INGREDIENTS.contains(itemStack.getItem())) {
-            itemStack.decrement(1);
-            this.remove(Entity.RemovalReason.DISCARDED);
-            player.giveItemStack(new ItemStack(ModItems.BLUE_COLORFLY_BOTTLE,1));
+            this.remove(RemovalReason.DISCARDED);
+            player.giveItemStack(new ItemStack(ModItems.GREENFLY_BOTTLE,1));
 
             return ActionResult.SUCCESS;
         }
@@ -341,12 +311,17 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
     protected void tickCramming() {}
     protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {return dimensions.height * 0.1F;}
 
-    //Static Variables
+    public static boolean canSpawn(EntityType<GreenflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        int i = world.getLightLevel(pos);
 
+        return i > 10 ? false : canMobSpawn(type, world, spawnReason, pos, random);
+    }
+
+    //Static Variables
     static {
         TAMING_INGREDIENTS = Sets.newHashSet(Items.GLASS_BOTTLE);
-        GENDER = DataTracker.registerData(ColorflyEntity.class, TrackedDataHandlerRegistry.BYTE);
-        CHILL = DataTracker.registerData(ColorflyEntity.class, TrackedDataHandlerRegistry.BYTE);
+        GENDER = DataTracker.registerData(GreenflyEntity.class, TrackedDataHandlerRegistry.BYTE);
+        CHILL = DataTracker.registerData(GreenflyEntity.class, TrackedDataHandlerRegistry.BYTE);
         CLOSE_PLAYER_PREDICATE = TargetPredicate.createNonAttackable().setBaseMaxDistance(4);
     }
 }

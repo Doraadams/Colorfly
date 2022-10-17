@@ -1,12 +1,12 @@
 {
-  "item.color.colorfly_spawn_egg": "Colorfly Spawn Egg",
-  "item.color.firefly_spawn_egg": "Firefly Spawn Egg",
+  "item.color.greenfly_spawn_egg": "Greenfly Spawn Egg",
+  "item.color.bluefly_spawn_egg": "Bluefly Spawn Egg",
 
-  "item.color.green_colorfly_bottle": "Green Colorfly Bottle",
-  "item.color.blue_colorfly_bottle": "Blue Colorfly Bottle",
+  "item.color.greenfly_bottle": "Greenfly Bottle",
+  "item.color.bluefly_bottle": "Bluefly Bottle",
 
-  "block.color.greenfly_lamp": "Greenfly Lamp",
-  "block.color.bluefly_lamp": "Bluefly Lamp",
+  "block.color.greenfly_lantern": "Greenfly Lantern",
+  "block.color.bluefly_lantern": "Bluefly Lantern",
 
   "itemGroup.color.colorfly": "Colorfly Tab"
 }

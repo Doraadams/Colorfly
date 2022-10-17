@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "color:item/green_colorfly_bottle"
+    "layer0": "color:item/bluefly_bottle"
   }
 }
