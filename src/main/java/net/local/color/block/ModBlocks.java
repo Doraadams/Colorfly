@@ -17,7 +17,7 @@ import net.minecraft.util.registry.Registry;
 
 public class ModBlocks {
 
-    //Custom Block Register
+    //Custom Block register
     public static final Block GREENFLY_LANTERN = registerBlock("greenfly_lantern",
             new GreenflyLanternBlock(FabricBlockSettings.of(Material.STONE).strength(4f).requiresTool().sounds(BlockSoundGroup.LANTERN)
                     .luminance(state -> state.get(GreenflyLanternBlock.LIT))), ModItemGroup.COLORFLY);
