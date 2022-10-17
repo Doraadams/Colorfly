@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "color:greenfly_lamp",
-    "color:bluefly_lamp"
+    "color:greenfly_lantern",
+    "color:bluefly_lantern"
   ]
 }

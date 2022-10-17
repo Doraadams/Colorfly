@@ -10,7 +10,7 @@ public class ModItemGroup {
 
     //Colorfly ItemGroup
     public static final ItemGroup COLORFLY = FabricItemGroupBuilder.build(
-            new Identifier(Colorfly.MOD_ID, "colorfly"), () -> new ItemStack(ModItems.COLORFLY_SPAWN_EGG));
+            new Identifier(Colorfly.MOD_ID, "colorfly"), () -> new ItemStack(ModItems.GREENFLY_SPAWN_EGG));
 
     //Debug Log
     public static void registerModItemGroup() {

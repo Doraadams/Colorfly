@@ -1,0 +1,12 @@
+{
+  "item.color.greenfly_spawn_egg": "绿色产卵蛋",
+  "item.color.bluefly_spawn_egg": "蓝色产卵蛋",
+
+  "item.color.greenfly_bottle": "绿色彩色瓶子",
+  "item.color.bluefly_bottle": "蓝色彩色瓶子",
+
+  "block.color.greenfly_lantern": "绿色灯笼",
+  "block.color.bluefly_lantern": "蓝灯笼",
+
+  "itemGroup.color.colorfly": "彩色标签页"
+}

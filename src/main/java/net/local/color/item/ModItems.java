@@ -14,11 +14,15 @@ public class ModItems {
     //Custom Item Register
     public static final Item GREENFLY_BOTTLE = registerItem("greenfly_bottle",
             new GreenflyBottleItem(new FabricItemSettings().maxCount(16).group(ModItemGroup.COLORFLY)));
+    public static final Item GREENFLY_SPAWN_EGG = registerItem("greenfly_spawn_egg",
+            new SpawnEggItem(ModEntities.GREENFLY,0x959B9B, 0x85F1BC,
+                    new FabricItemSettings().group(ModItemGroup.COLORFLY)));
+
     public static final Item BLUEFLY_BOTTLE = registerItem("bluefly_bottle",
             new BlueflyBottleItem(new FabricItemSettings().maxCount(16).group(ModItemGroup.COLORFLY)));
 
-    public static final Item COLORFLY_SPAWN_EGG = registerItem("colorfly_spawn_egg",
-            new SpawnEggItem(ModEntities.COLORFLY,0xCECCBA, 0x51A03E,
+    public static final Item BLUEFLY_SPAWN_EGG = registerItem("bluefly_spawn_egg",
+            new SpawnEggItem(ModEntities.BLUEFLY,0x959B9B, 0x9fedf4,
                     new FabricItemSettings().group(ModItemGroup.COLORFLY)));
 
     //General Item Register
