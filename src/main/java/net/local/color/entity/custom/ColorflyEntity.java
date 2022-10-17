@@ -307,13 +307,13 @@ public class ColorflyEntity extends TameableEntity implements IAnimatable {
         if (!this.world.isClient && this.getTypeVariant() == 0 && TAMING_INGREDIENTS.contains(itemStack.getItem())) {
             itemStack.decrement(1);
             this.remove(Entity.RemovalReason.DISCARDED);
-            player.giveItemStack(new ItemStack(ModItems.GREEN_COLORFLY_BOTTLE,1));
+            player.giveItemStack(new ItemStack(ModItems.GREENFLY_BOTTLE,1));
 
             return ActionResult.SUCCESS;
         } else if (!this.world.isClient && this.getTypeVariant() == 1 && TAMING_INGREDIENTS.contains(itemStack.getItem())) {
             itemStack.decrement(1);
             this.remove(Entity.RemovalReason.DISCARDED);
-            player.giveItemStack(new ItemStack(ModItems.BLUE_COLORFLY_BOTTLE,1));
+            player.giveItemStack(new ItemStack(ModItems.BLUEFLY_BOTTLE,1));
 
             return ActionResult.SUCCESS;
         }

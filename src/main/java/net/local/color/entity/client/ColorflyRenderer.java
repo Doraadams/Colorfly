@@ -23,9 +23,9 @@ public class ColorflyRenderer extends GeoEntityRenderer <ColorflyEntity> {
     public static final Map<ColorflyVariant, Identifier> LOCATION_BY_VARIANT =
             Util.make(Maps.newEnumMap(ColorflyVariant.class), (map) -> {
                 map.put(ColorflyVariant.GREEN,
-                        new Identifier(Colorfly.MOD_ID, "textures/entity/colorfly_texture_green.png"));
+                        new Identifier(Colorfly.MOD_ID, "textures/entity/greenfly_texture.png"));
                 map.put(ColorflyVariant.BLUE,
-                        new Identifier(Colorfly.MOD_ID, "textures/entity/colorfly_texture_blue.png"));
+                        new Identifier(Colorfly.MOD_ID, "textures/entity/bluefly_texture.png"));
             });
 
     // Render Factory, Shadow Radius, and Emissive Initialize

@@ -1,6 +1,0 @@
-{
-  "variants": {
-    "hanging=false": { "model": "color:block/bluefly_lamp" },
-    "hanging=true": { "model": "color:block/bluefly_lamp_hanging" }
-  }
-}

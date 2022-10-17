@@ -16,7 +16,7 @@ public class ColorflyClient implements ClientModInitializer {
     public void onInitializeClient() {
         EntityRendererRegistry.register(ModEntities.COLORFLY, ColorflyRenderer::new);
 
-        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.GREENFLY_LAMP, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.BLUEFLY_LAMP, RenderLayer.getTranslucent());
+        //BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.GREENFLY_LANTERN, RenderLayer.getTranslucent());
+        //BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.BLUEFLY_LANTERN, RenderLayer.getTranslucent());
     }
 }

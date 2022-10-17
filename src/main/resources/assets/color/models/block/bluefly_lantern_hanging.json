@@ -1,0 +1,7 @@
+{
+	"parent": "color:block/colorfly_lantern_hanging",
+	"textures": {
+		"2": "color:block/bluefly_lantern",
+		"particle": "color:block/bluefly_lantern"
+	}
+}
