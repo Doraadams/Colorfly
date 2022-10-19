@@ -57,6 +57,7 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     private static final Set<Item> CAPTURE;
     private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
     private static final TrackedData<Byte> SCARED;
+    private static final TrackedData<Byte> MOVESTATE;
     private static boolean WAIT = false;
     public static final int field_28638 = MathHelper.ceil(1.4959966F);
     int moveDelay = 0;
@@ -71,17 +72,20 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
+        this.dataTracker.startTracking(MOVESTATE, (byte)0);
         this.dataTracker.startTracking(SCARED, (byte)0);
     }
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(SCARED, nbt.getByte("Scared"));
+        this.dataTracker.set(MOVESTATE, nbt.getByte("Movestate"));
     }
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putByte("Scared", this.dataTracker.get(SCARED));
+        nbt.putByte("Movestate", this.dataTracker.get(MOVESTATE));
     }
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
@@ -118,12 +122,12 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     @SuppressWarnings("rawtypes")
     protected void initGoals() {
         this.goalSelector.add(0, new EscapeDangerGoal(this, 1));
-        this.goalSelector.add(2, new SwimGoal(this));
-        this.goalSelector.add(1, new FleeEntityGoal(this, FrogEntity.class ,2.0F, 1, 1));
-        this.goalSelector.add(1, new FleeEntityGoal(this, PlayerEntity.class, 1.0F, 1, 1));
-        this.goalSelector.add(6, new GreenflyEntity.AvoidDaylightGoal(1.0));
-        this.goalSelector.add(5, new WanderAroundFarGoal(this, 1));
-        this.goalSelector.add(8, new LookAroundGoal(this));
+        this.goalSelector.add(1, new SwimGoal(this));
+        this.goalSelector.add(2, new FleeEntityGoal(this, FrogEntity.class ,2.0F, 1, 1));
+        this.goalSelector.add(2, new FleeEntityGoal(this, PlayerEntity.class, 1.0F, 1, 1));
+        this.goalSelector.add(3, new GreenflyEntity.AvoidDaylightGoal(1.0));
+        this.goalSelector.add(4, new WanderAroundFarGoal(this, 1));
+        this.goalSelector.add(6, new LookAroundGoal(this));
     }
 
     // Greenfly Custom Goals
@@ -142,7 +146,7 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
         }
 
         public boolean canStart() {
-            if (!GreenflyEntity.this.isSleeping() && this.mob.getTarget() == null) {
+            if (!GreenflyEntity.this.navigation.isIdle()) {
                 if (GreenflyEntity.this.world.isThundering() && GreenflyEntity.this.world.isSkyVisible(this.mob.getBlockPos())) {
                     return this.targetShadedPos();
                 } else if (this.timer > 0) {
@@ -161,50 +165,6 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
             super.start();
         }
     }
-
-    /*
-    public class GreenflyFlyAroundGoal extends Goal {
-        GreenflyFlyAroundGoal() {
-            this.setControls(EnumSet.of(Control.MOVE));
-        }
-        public boolean canStart() {
-            return GreenflyEntity.this.navigation.isIdle() && GreenflyEntity.this.random.nextInt(100) == 0;
-        }
-        public boolean shouldContinue() {
-            return GreenflyEntity.this.navigation.isFollowingPath();
-        }
-        public void start() {
-            Vec3d vec3d = this.getRandomLocation();
-            if (vec3d != null) {
-                GreenflyEntity.this.navigation.startMovingAlong(GreenflyEntity.this.navigation.findPathTo(new BlockPos(vec3d), 2), 0.5);
-            }
-        }
-        @Nullable
-        private Vec3d getRandomLocation() {
-            Vec3d vec3d2;
-            vec3d2 = GreenflyEntity.this.getRotationVec(0.0F);
-            Vec3d vec3d3 = AboveGroundTargeting.find(GreenflyEntity.this, 8, 7, vec3d2.x, vec3d2.z, 1.5707964F, 3, 1);
-            return vec3d3 != null ? vec3d3 : NoPenaltySolidTargeting.find(GreenflyEntity.this, 8, 4, -2, vec3d2.x, vec3d2.z, 1.5707963705062866);
-        }
-    }
-
-    private abstract class NotScaredGoal extends Goal {
-        NotScaredGoal() {
-        }
-
-        public abstract boolean canGreenflyStart();
-
-        public abstract boolean canGreenflyContinue();
-
-        public boolean canStart() {
-            return this.canGreenflyStart() && !GreenflyEntity.this.isScared();
-        }
-
-        public boolean shouldContinue() {
-            return this.canGreenflyContinue() && !GreenflyEntity.this.isScared();
-        }
-    }
-    */
 
     // Set & Check
     public boolean isScared () { return (this.dataTracker.get(SCARED) & 1) != 0; }
@@ -225,15 +185,29 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
             this.setScared(false);
         }
     }
-    public void setMovementState() {
-        if (this.isOnGround() && this.getVelocity().getX() == 0 && this.getVelocity().getZ() == 0) {
-            if ( moveDelay >= 10 && this.getVelocity().getY() <= 0) {
-                this.setVelocity(this.getVelocity().getX(), -0.2, this.getVelocity().getZ());
-                if (moveCondDelay >= (random.nextInt((50 - 20)) + 20)) {
+    public boolean isGround () { return (this.dataTracker.get(MOVESTATE) & 1) != 0; }
+    public void setGround () {
+        BlockPos pos = this.getBlockPos().add(0.0,-0.51,0.0);
+        if (!this.world.getBlockState(pos).isAir()) {
+            if (this.getVelocity().getY() <= 0) {
+                this.dataTracker.set(MOVESTATE, (byte) 1);
+            }
+        } else {
+            this.dataTracker.set(MOVESTATE, (byte) -2);
+        }
+    }
+    public void setMovementState () {
+        if (this.isGround()) {
+            if (moveDelay > 20) {
+                if (moveCondDelay < (random.nextInt(80-40)+40)) {
+                    this.setVelocity(this.getVelocity().multiply(1.0, 0.8,1.0));
+                    if (this.getVelocity().getY() <= 0) {
+                        this.setVelocity(this.getVelocity().getX(), -0.05, this.getVelocity().getZ());
+                        moveCondDelay++;
+                    }
+                } else {
                     moveDelay = 0;
                     moveCondDelay = 0;
-                } else {
-                    moveCondDelay++;
                 }
             } else {
                 moveDelay++;
@@ -273,13 +247,14 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
         if (!this.isScared() && this.random.nextInt(19) == 0){
             this.checkPlayerScared();
         }
+        this.setMovementState();
         super.mobTick();
     }
     public void tick() {
+        this.setGround();
         super.tick();
     }
     public void tickMovement() {
-        this.setMovementState();
         super.tickMovement();
     }
 
@@ -294,7 +269,6 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
             if (rand == 0 && !WAIT) {
                 if (this.isBlink()) {
                     String morse = this.setMorse();
-                    System.out.println(morse);
                     if (Objects.equals(morse, "dark")) {
                         WAIT = true;
                         event.getController().markNeedsReload();
@@ -302,11 +276,11 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
                     } else if (Objects.equals(morse, "wet")) {
                         WAIT = true;
                         event.getController().markNeedsReload();
-                        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.dark", false));
+                        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.wet", false));
                     } else if (Objects.equals(morse, "storm")) {
                         WAIT = true;
                         event.getController().markNeedsReload();
-                        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.dark", false));
+                        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.storm", false));
                     }
                 }
             }
@@ -353,8 +327,6 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     // Sound
     protected float getSoundVolume() { return 0.0F; }
     protected SoundEvent getAmbientSound() { return null; }
-    //protected SoundEvent getHurtSound(DamageSource source) { return SoundEvents.ENTITY_BEE_HURT; }
-    //protected SoundEvent getDeathSound() { return SoundEvents.ENTITY_BEE_DEATH; }
 
     // Custom Spawn Condition
     public static boolean canSpawn(EntityType<GreenflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
@@ -367,6 +339,7 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     static {
         CAPTURE = Sets.newHashSet(Items.GLASS_BOTTLE);
         SCARED = DataTracker.registerData(GreenflyEntity.class, TrackedDataHandlerRegistry.BYTE);
+        MOVESTATE = DataTracker.registerData(GreenflyEntity.class, TrackedDataHandlerRegistry.BYTE);
         CLOSE_PLAYER_PREDICATE = TargetPredicate.createNonAttackable().setBaseMaxDistance(1);
     }
 }

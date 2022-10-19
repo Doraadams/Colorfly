@@ -57,9 +57,11 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
     private static final Set<Item> CAPTURE;
     private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
     private static final TrackedData<Byte> SCARED;
+    private static final TrackedData<Byte> MOVESTATE;
     private static boolean WAIT = false;
     public static final int field_28638 = MathHelper.ceil(1.4959966F);
-    int I = this.random.nextInt(9);
+    int moveDelay = 0;
+    int moveCondDelay = 0;
 
     // Initialize Bluefly
     public BlueflyEntity(EntityType<? extends TameableEntity> entityType, World world) {
@@ -70,17 +72,20 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
+        this.dataTracker.startTracking(MOVESTATE, (byte)0);
         this.dataTracker.startTracking(SCARED, (byte)0);
     }
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(SCARED, nbt.getByte("Scared"));
+        this.dataTracker.set(MOVESTATE, nbt.getByte("Movestate"));
     }
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putByte("Scared", this.dataTracker.get(SCARED));
+        nbt.putByte("Movestate", this.dataTracker.get(MOVESTATE));
     }
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
@@ -117,12 +122,12 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
     @SuppressWarnings("rawtypes")
     protected void initGoals() {
         this.goalSelector.add(0, new EscapeDangerGoal(this, 1));
-        this.goalSelector.add(1, new FleeEntityGoal(this, FrogEntity.class ,2.0F, 1, 1));
-        this.goalSelector.add(1, new FleeEntityGoal(this, PlayerEntity.class, 1.0F, 1, 1));
-        this.goalSelector.add(1, new EscapeSunlightGoal(this, 1));
-        this.goalSelector.add(2, new SwimGoal(this));
-        this.goalSelector.add(2, new AvoidSunlightGoal(this));
-        this.goalSelector.add(5, new WanderAroundFarGoal(this, 1));
+        this.goalSelector.add(1, new SwimGoal(this));
+        this.goalSelector.add(2, new FleeEntityGoal(this, FrogEntity.class ,2.0F, 1, 1));
+        this.goalSelector.add(2, new FleeEntityGoal(this, PlayerEntity.class, 1.0F, 1, 1));
+        this.goalSelector.add(3, new BlueflyEntity.AvoidDaylightGoal(1.0));
+        this.goalSelector.add(4, new WanderAroundFarGoal(this, 1));
+        this.goalSelector.add(6, new LookAroundGoal(this));
     }
 
     // Bluefly Custom Goals
@@ -133,50 +138,33 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
             return true;
         }
     }
+    class AvoidDaylightGoal extends EscapeSunlightGoal {
+        private int timer = toGoalTicks(100);
 
-    /*
-    public class BlueflyFlyAroundGoal extends Goal {
-        BlueflyFlyAroundGoal() {
-            this.setControls(EnumSet.of(Control.MOVE));
+        public AvoidDaylightGoal(double speed) {
+            super(BlueflyEntity.this, speed);
         }
+
         public boolean canStart() {
-            return BlueflyEntity.this.navigation.isIdle() && BlueflyEntity.this.random.nextInt(100) == 0;
-        }
-        public boolean shouldContinue() {
-            return BlueflyEntity.this.navigation.isFollowingPath();
-        }
-        public void start() {
-            Vec3d vec3d = this.getRandomLocation();
-            if (vec3d != null) {
-                BlueflyEntity.this.navigation.startMovingAlong(BlueflyEntity.this.navigation.findPathTo(new BlockPos(vec3d), 2), 0.5);
+            if (!BlueflyEntity.this.navigation.isIdle()) {
+                if (BlueflyEntity.this.world.isThundering() && BlueflyEntity.this.world.isSkyVisible(this.mob.getBlockPos())) {
+                    return this.targetShadedPos();
+                } else if (this.timer > 0) {
+                    --this.timer;
+                    return false;
+                } else {
+                    this.timer = 100;
+                    BlockPos blockPos = this.mob.getBlockPos();
+                    return BlueflyEntity.this.world.isDay() && BlueflyEntity.this.world.isSkyVisible(blockPos) && !((ServerWorld)BlueflyEntity.this.world).isNearOccupiedPointOfInterest(blockPos) && this.targetShadedPos();
+                }
+            } else {
+                return false;
             }
         }
-        @Nullable
-        private Vec3d getRandomLocation() {
-            Vec3d vec3d2;
-            vec3d2 = BlueflyEntity.this.getRotationVec(0.0F);
-            Vec3d vec3d3 = AboveGroundTargeting.find(BlueflyEntity.this, 8, 7, vec3d2.x, vec3d2.z, 1.5707964F, 3, 1);
-            return vec3d3 != null ? vec3d3 : NoPenaltySolidTargeting.find(BlueflyEntity.this, 8, 4, -2, vec3d2.x, vec3d2.z, 1.5707963705062866);
+        public void start() {
+            super.start();
         }
     }
-
-    private abstract class NotScaredGoal extends Goal {
-        NotScaredGoal() {
-        }
-
-        public abstract boolean canBlueflyStart();
-
-        public abstract boolean canBlueflyContinue();
-
-        public boolean canStart() {
-            return this.canBlueflyStart() && !BlueflyEntity.this.isScared();
-        }
-
-        public boolean shouldContinue() {
-            return this.canBlueflyContinue() && !BlueflyEntity.this.isScared();
-        }
-    }
-    */
 
     // Set & Check
     public boolean isScared () { return (this.dataTracker.get(SCARED) & 1) != 0; }
@@ -188,34 +176,45 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
             this.dataTracker.set(SCARED, (byte)(b & -2));
         }
     }
-    public void setPlayerScared () {
-        BlockPos blockPos = this.getBlockPos();
-
+    public void checkPlayerScared () {
         if (!this.isScared()) {
-            boolean bl1 = this.isSilent();
             if (this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null) {
                 this.setScared(true);
-                if (!bl1) {
-                    this.world.syncWorldEvent(null, 1025, blockPos, 0);
-                }
             }
         } else {
             this.setScared(false);
         }
     }
-    public void setMovementState() {
-        if (this.isOnGround()) {
-            if (I < 100) {
-                if (I > 10) {
-                    this.setVelocity(this.getVelocity().multiply(1.0, 0.0, 1.0));
-                }
-                I++;
-            } else {
-                I = 0;
+    public boolean isGround () { return (this.dataTracker.get(MOVESTATE) & 1) != 0; }
+    public void setGround () {
+        BlockPos pos = this.getBlockPos().add(0.0,-0.51,0.0);
+        if (!this.world.getBlockState(pos).isAir()) {
+            if (this.getVelocity().getY() <= 0) {
+                this.dataTracker.set(MOVESTATE, (byte) 1);
             }
         } else {
-            this.setVelocity(this.getVelocity().multiply(1.0, 0.8, 1.0));
-            I++;
+            this.dataTracker.set(MOVESTATE, (byte) -2);
+        }
+    }
+    public void setMovementState () {
+        if (this.isGround()) {
+            if (moveDelay > 20) {
+                if (moveCondDelay < (random.nextInt(200-100)+100)) {
+                    this.setVelocity(this.getVelocity().multiply(1.0, 0.8,1.0));
+                    if (this.getVelocity().getY() <= 0) {
+                        this.setVelocity(this.getVelocity().getX(), -0.05, this.getVelocity().getZ());
+                        moveCondDelay++;
+                    }
+                } else {
+                    moveDelay = 0;
+                    moveCondDelay = 0;
+                }
+            } else {
+                moveDelay++;
+            }
+        } else {
+            moveDelay = 0;
+            moveCondDelay = 0;
         }
     }
 
@@ -225,9 +224,7 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
         if (!isScared()) {
             if ((time <= 1000 || time >= 13000)) {
                 return true;
-            } else if (this.world.isRaining() || this.world.isThundering()) {
-                return true;
-            }
+            } else return this.world.isRaining() || this.world.isThundering();
         }
         return false;
     }
@@ -248,12 +245,13 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
     // Tick and Movement Code
     public void mobTick() {
         if (!this.isScared() && this.random.nextInt(19) == 0){
-            this.setPlayerScared();
+            this.checkPlayerScared();
         }
         this.setMovementState();
         super.mobTick();
     }
     public void tick() {
+        this.setGround();
         super.tick();
     }
     public void tickMovement() {
@@ -271,7 +269,6 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
             if (rand == 0 && !WAIT) {
                 if (this.isBlink()) {
                     String morse = this.setMorse();
-                    System.out.println(morse);
                     if (Objects.equals(morse, "dark")) {
                         WAIT = true;
                         event.getController().markNeedsReload();
@@ -279,11 +276,11 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
                     } else if (Objects.equals(morse, "wet")) {
                         WAIT = true;
                         event.getController().markNeedsReload();
-                        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.dark", false));
+                        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.wet", false));
                     } else if (Objects.equals(morse, "storm")) {
                         WAIT = true;
                         event.getController().markNeedsReload();
-                        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.dark", false));
+                        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.storm", false));
                     }
                 }
             }
@@ -330,8 +327,6 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
     // Sound
     protected float getSoundVolume() { return 0.0F; }
     protected SoundEvent getAmbientSound() { return null; }
-    //protected SoundEvent getHurtSound(DamageSource source) { return SoundEvents.ENTITY_BEE_HURT; }
-    //protected SoundEvent getDeathSound() { return SoundEvents.ENTITY_BEE_DEATH; }
 
     // Custom Spawn Condition
     public static boolean canSpawn(EntityType<BlueflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
@@ -344,6 +339,7 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
     static {
         CAPTURE = Sets.newHashSet(Items.GLASS_BOTTLE);
         SCARED = DataTracker.registerData(BlueflyEntity.class, TrackedDataHandlerRegistry.BYTE);
+        MOVESTATE = DataTracker.registerData(BlueflyEntity.class, TrackedDataHandlerRegistry.BYTE);
         CLOSE_PLAYER_PREDICATE = TargetPredicate.createNonAttackable().setBaseMaxDistance(1);
     }
 }
