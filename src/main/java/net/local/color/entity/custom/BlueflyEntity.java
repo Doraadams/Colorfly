@@ -329,7 +329,7 @@ public class BlueflyEntity extends TameableEntity implements IAnimatable {
     protected SoundEvent getAmbientSound() { return null; }
 
     // Custom Spawn Condition
-    public static boolean canSpawn(EntityType<BlueflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+    public static boolean canCustomSpawn(EntityType<BlueflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
         int l = world.getLightLevel(pos);
 
         return l > 10 ? false : canMobSpawn(type, world, spawnReason, pos, random);

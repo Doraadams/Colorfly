@@ -8,6 +8,7 @@ import net.local.color.entity.custom.BlueflyEntity;
 import net.local.color.entity.custom.GreenflyEntity;
 import net.local.color.item.ModItemGroup;
 import net.local.color.item.ModItems;
+import net.local.color.potion.ModPotions;
 import net.local.color.world.gen.ModWorldGen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +23,13 @@ public class Colorfly implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		GeckoLib.initialize();
+
 		ModItems.registerModItems();
 		ModItemGroup.registerModItemGroup();
 		ModBlocks.registerModBlocks();
+
+		ModPotions.registerPotions();
+
 		ModWorldGen.generateModWorldGen();
 
 		FabricDefaultAttributeRegistry.register(ModEntities.GREENFLY, GreenflyEntity.setAttributes());

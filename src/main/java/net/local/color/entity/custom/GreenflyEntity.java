@@ -54,14 +54,12 @@ import java.util.Set;
 //Greenfly class w/ animation call
 public class GreenflyEntity extends TameableEntity implements IAnimatable {
     private final AnimationFactory factory = new AnimationFactory(this);
+    public static final int field_28638 = MathHelper.ceil(1.4959966F);
     private static final Set<Item> CAPTURE;
     private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
     private static final TrackedData<Byte> SCARED;
-    private static final TrackedData<Byte> MOVESTATE;
-    private static boolean WAIT = false;
-    public static final int field_28638 = MathHelper.ceil(1.4959966F);
-    int moveDelay = 0;
-    int moveCondDelay = 0;
+    private static final TrackedData<Byte> STATE;
+    private static final TrackedData<Byte> WANT;
 
     // Initialize Greenfly
     public GreenflyEntity(EntityType<? extends TameableEntity> entityType, World world) {
@@ -72,20 +70,22 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(MOVESTATE, (byte)0);
+        this.dataTracker.startTracking(STATE, (byte)0);
         this.dataTracker.startTracking(SCARED, (byte)0);
+        this.dataTracker.startTracking(WANT, (byte)0);
     }
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(SCARED, nbt.getByte("Scared"));
-        this.dataTracker.set(MOVESTATE, nbt.getByte("Movestate"));
+        this.dataTracker.set(STATE, nbt.getByte("State"));
     }
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putByte("Scared", this.dataTracker.get(SCARED));
-        nbt.putByte("Movestate", this.dataTracker.get(MOVESTATE));
+        nbt.putByte("State", this.dataTracker.get(STATE));
+
     }
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
@@ -170,51 +170,32 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     public boolean isScared () { return (this.dataTracker.get(SCARED) & 1) != 0; }
     public void setScared (boolean safe) {
         byte b = this.dataTracker.get(SCARED);
-        if (safe) {
-            this.dataTracker.set(SCARED, (byte)(b | 1));
+        if (safe || this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null) {
+            if (this.random.nextInt(19) == 0) {
+                this.dataTracker.set(SCARED, (byte)(b | 1));
+            }
         } else {
             this.dataTracker.set(SCARED, (byte)(b & -2));
         }
     }
-    public void checkPlayerScared () {
-        if (!this.isScared()) {
-            if (this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null) {
-                this.setScared(true);
-            }
-        } else {
-            this.setScared(false);
-        }
-    }
-    public boolean isGround () { return (this.dataTracker.get(MOVESTATE) & 1) != 0; }
+    public boolean isGround () { return (this.dataTracker.get(STATE) & 1) != 0; }
     public void setGround () {
-        BlockPos pos = this.getBlockPos().add(0.0,-0.51,0.0);
-        if (!this.world.getBlockState(pos).isAir()) {
-            if (this.getVelocity().getY() <= 0) {
-                this.dataTracker.set(MOVESTATE, (byte) 1);
+        byte b = this.dataTracker.get(STATE);
+        if (!this.world.getBlockState(this.getBlockPos().down().add(0.0, 0.49, 0.0)).isAir()) {
+            if (this.getVelocity().getY() == 0) {
+                this.dataTracker.set(STATE, (byte) (b | 1));
             }
         } else {
-            this.dataTracker.set(MOVESTATE, (byte) -2);
+            this.dataTracker.set(STATE, (byte) (b | -2));
         }
     }
-    public void setMovementState () {
-        if (this.isGround()) {
-            if (moveDelay > 20) {
-                if (moveCondDelay < (random.nextInt(80-40)+40)) {
-                    this.setVelocity(this.getVelocity().multiply(1.0, 0.8,1.0));
-                    if (this.getVelocity().getY() <= 0) {
-                        this.setVelocity(this.getVelocity().getX(), -0.05, this.getVelocity().getZ());
-                        moveCondDelay++;
-                    }
-                } else {
-                    moveDelay = 0;
-                    moveCondDelay = 0;
-                }
-            } else {
-                moveDelay++;
-            }
+    public boolean isWant () { return (this.dataTracker.get(WANT) & 1) != 0; }
+    public void setWant (boolean want) {
+        byte b = this.dataTracker.get(WANT);
+        if (want) {
+            this.dataTracker.set(WANT, (byte)(b | 1));
         } else {
-            moveDelay = 0;
-            moveCondDelay = 0;
+            this.dataTracker.set(WANT, (byte)(b & -2));
         }
     }
 
@@ -242,16 +223,36 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
         return morse;
     }
 
-    // Tick and Movement Code
-    public void mobTick() {
-        if (!this.isScared() && this.random.nextInt(19) == 0){
-            this.checkPlayerScared();
+    // Fly + Walk State Controller
+    public void stateControl () {
+        this.setGround();
+        if (this.isGround()) {
+            if ((this.random.nextInt(99) > 49) && !this.isWant()) {
+                if (this.navigation.isIdle()) {
+                    this.setWant(true);
+                }
+            }
+            if (this.isWant()) {
+                this.setVelocity(this.getVelocity().getX(), -0.15, this.getVelocity().getZ());
+                if ((this.random.nextInt(19) == 0) && this.navigation.isFollowingPath()) {
+                    this.setWant(false);
+                }
+            }
+        } else {
+            if (this.getVelocity().getY() < -0.15) {
+                this.setVelocity(this.getVelocity().multiply(1, 0.7, 1));
+            }
         }
-        this.setMovementState();
+    }
+
+    // Tick
+    public void mobTick() {
+        this.setScared(false);
+        this.stateControl();
+
         super.mobTick();
     }
     public void tick() {
-        this.setGround();
         super.tick();
     }
     public void tickMovement() {
@@ -260,32 +261,26 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
 
     // Animation code
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.idle", true));
+        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.idle", false));
         return PlayState.CONTINUE;
     }
     private PlayState blinkPredicate(@SuppressWarnings("rawtypes") AnimationEvent event) {
         if (event.getController().getAnimationState().equals(AnimationState.Stopped)) {
             int rand = this.random.nextInt(3);
-            if (rand == 0 && !WAIT) {
+            if (rand == 0) {
                 if (this.isBlink()) {
                     String morse = this.setMorse();
                     if (Objects.equals(morse, "dark")) {
-                        WAIT = true;
                         event.getController().markNeedsReload();
                         event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.dark", false));
                     } else if (Objects.equals(morse, "wet")) {
-                        WAIT = true;
                         event.getController().markNeedsReload();
                         event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.wet", false));
                     } else if (Objects.equals(morse, "storm")) {
-                        WAIT = true;
                         event.getController().markNeedsReload();
                         event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.colorfly.storm", false));
                     }
                 }
-            }
-            if (rand==1) {
-                WAIT = false;
             }
         }
         return PlayState.CONTINUE;
@@ -329,7 +324,7 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     protected SoundEvent getAmbientSound() { return null; }
 
     // Custom Spawn Condition
-    public static boolean canSpawn(EntityType<GreenflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+    public static boolean canCustomSpawn(EntityType<GreenflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
         int l = world.getLightLevel(pos);
 
         return l > 10 ? false : canMobSpawn(type, world, spawnReason, pos, random);
@@ -339,7 +334,8 @@ public class GreenflyEntity extends TameableEntity implements IAnimatable {
     static {
         CAPTURE = Sets.newHashSet(Items.GLASS_BOTTLE);
         SCARED = DataTracker.registerData(GreenflyEntity.class, TrackedDataHandlerRegistry.BYTE);
-        MOVESTATE = DataTracker.registerData(GreenflyEntity.class, TrackedDataHandlerRegistry.BYTE);
+        STATE = DataTracker.registerData(GreenflyEntity.class, TrackedDataHandlerRegistry.BYTE);
+        WANT = DataTracker.registerData(GreenflyEntity.class, TrackedDataHandlerRegistry.BYTE);
         CLOSE_PLAYER_PREDICATE = TargetPredicate.createNonAttackable().setBaseMaxDistance(1);
     }
 }

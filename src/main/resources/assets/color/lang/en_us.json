@@ -1,4 +1,6 @@
 {
+  "itemGroup.color.colorfly": "Colorfly Tab",
+
   "item.color.greenfly_spawn_egg": "Greenfly Spawn Egg",
   "item.color.bluefly_spawn_egg": "Bluefly Spawn Egg",
 
@@ -8,5 +10,7 @@
   "block.color.greenfly_lantern": "Greenfly Lantern",
   "block.color.bluefly_lantern": "Bluefly Lantern",
 
-  "itemGroup.color.colorfly": "Colorfly Tab"
+  "item.minecraft.potion.effect.glowing_potion": "Potion of Glowing",
+  "item.minecraft.splash_potion.effect.glowing_potion": "Splash Potion of Glowing",
+  "item.minecraft.lingering_potion.effect.glowing_potion": "Lingering Potion of Glowing"
 }
