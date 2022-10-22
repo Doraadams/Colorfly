@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "item": "color:greenfly_lantern"
+    },
+    "title": "Colorfly Lantern",
+    "description": "Here come real stars to fill the upper skies",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "color:colorfly_bottle",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "color:greenfly_lantern",
+              "color:bluefly_lantern"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
