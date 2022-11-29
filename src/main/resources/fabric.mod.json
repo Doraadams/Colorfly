@@ -22,6 +22,9 @@
     ],
     "client": [
       "net.local.color.ColorflyClient"
+    ],
+    "fabric-datagen": [
+      "net.local.color.datagen.ModDataGeneration"
     ]
   },
   "mixins": [

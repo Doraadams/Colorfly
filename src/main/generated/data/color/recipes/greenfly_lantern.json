@@ -2,18 +2,18 @@
   "type": "minecraft:crafting_shaped",
   "key": {
     "#": {
-      "item": "minecraft:iron_nugget"
-    },
-    "-": {
       "item": "color:greenfly_bottle"
+    },
+    "X": {
+      "item": "minecraft:iron_nugget"
     }
   },
   "pattern": [
-    "###",
-    "#-#",
-    "###"
+    "XXX",
+    "X#X",
+    "XXX"
   ],
   "result": {
-    "item": "color:greenfly_bottle"
+    "item": "color:greenfly_lantern"
   }
 }

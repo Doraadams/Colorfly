@@ -25,8 +25,8 @@ public class Colorfly implements ModInitializer {
 		GeckoLib.initialize();
 
 		ModItems.registerModItems();
-		ModItemGroup.registerModItemGroup();
 		ModBlocks.registerModBlocks();
+		ModItemGroup.registerModItemGroup();
 
 		ModPotions.registerPotions();
 

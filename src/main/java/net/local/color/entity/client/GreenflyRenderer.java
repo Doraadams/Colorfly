@@ -32,7 +32,7 @@ public class GreenflyRenderer extends GeoEntityRenderer <GreenflyEntity> {
     public RenderLayer getRenderType(GreenflyEntity animatable, float partialTicks, MatrixStack stack,
                                      VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder,
                                      int packedLightIn, Identifier textureLocation) {
-        stack.scale(0.75f, 0.75f, 0.75f);
+        stack.scale(0.6f, 0.6f, 0.6f);
         return RenderLayer.getEntityTranslucent(this.getTextureLocation(animatable));
     }
 }
