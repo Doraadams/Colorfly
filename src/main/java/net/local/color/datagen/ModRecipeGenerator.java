@@ -1,25 +1,27 @@
 package net.local.color.datagen;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.local.color.block.ModBlocks;
+import net.local.color.block.custom.GreenflyLanternBlock;
 import net.local.color.item.ModItems;
-import net.minecraft.data.server.RecipeProvider;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
+import net.minecraft.data.server.recipe.RecipeProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.item.Items;
+import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.util.Identifier;
 
 import java.util.function.Consumer;
 
 public class ModRecipeGenerator extends FabricRecipeProvider {
-    public ModRecipeGenerator(FabricDataGenerator dataGenerator) {
-        super(dataGenerator);
+    public ModRecipeGenerator(FabricDataOutput dataOutput) {
+        super(dataOutput);
     }
 
     @Override
-    protected void generateRecipes(Consumer<RecipeJsonProvider> exporter) {
-        ShapedRecipeJsonBuilder.create(ModBlocks.GREENFLY_LANTERN)
+    public void generate(Consumer<RecipeJsonProvider> exporter) {
+        ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, ModBlocks.GREENFLY_LANTERN, 1)
                 .pattern("XXX")
                 .pattern("X#X")
                 .pattern("XXX")
@@ -31,7 +33,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                         RecipeProvider.conditionsFromItem(ModItems.GREENFLY_BOTTLE))
                 .offerTo(exporter, new Identifier(RecipeProvider.getRecipeName(ModBlocks.GREENFLY_LANTERN)));
 
-        ShapedRecipeJsonBuilder.create(ModBlocks.BLUEFLY_LANTERN)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, ModBlocks.BLUEFLY_LANTERN)
                 .pattern("XXX")
                 .pattern("X#X")
                 .pattern("XXX")

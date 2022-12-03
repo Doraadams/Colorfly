@@ -12,7 +12,7 @@ import net.local.color.potion.ModPotions;
 import net.local.color.world.gen.ModWorldGen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.bernie.geckolib3.GeckoLib;
+import software.bernie.geckolib.GeckoLib;
 
 //Initialize Colorfly
 public class Colorfly implements ModInitializer {

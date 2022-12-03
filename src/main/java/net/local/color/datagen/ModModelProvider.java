@@ -1,6 +1,6 @@
 package net.local.color.datagen;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.local.color.block.ModBlocks;
 import net.local.color.item.ModItems;
@@ -9,8 +9,8 @@ import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Models;
 
 public class ModModelProvider extends FabricModelProvider {
-    public ModModelProvider(FabricDataGenerator dataGenerator) {
-        super(dataGenerator);
+    public ModModelProvider(FabricDataOutput dataOutput) {
+        super(dataOutput);
     }
 
     @Override

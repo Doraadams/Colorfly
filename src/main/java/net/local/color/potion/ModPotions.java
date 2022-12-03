@@ -7,14 +7,15 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class ModPotions {
     public static Potion GLOWING_POTION;
 
     public static Potion registerPotion(String name) {
-        return Registry.register(Registry.POTION, new Identifier(Colorfly.MOD_ID, name),
+        return Registry.register(Registries.POTION, new Identifier(Colorfly.MOD_ID, name),
                 new Potion(new StatusEffectInstance(StatusEffects.GLOWING, 2400, 2, false, false, true)));
     }
 

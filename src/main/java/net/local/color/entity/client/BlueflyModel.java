@@ -2,11 +2,11 @@ package net.local.color.entity.client;
 
 import net.local.color.Colorfly;
 import net.local.color.entity.custom.BlueflyEntity;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 import net.minecraft.util.Identifier;
 
 //Bluefly Model Resource Directories/Variables
-public class BlueflyModel extends AnimatedGeoModel<BlueflyEntity> {
+public class BlueflyModel extends GeoModel<BlueflyEntity> {
     @Override
     public Identifier getModelResource(BlueflyEntity object) {
         return new Identifier(Colorfly.MOD_ID, "geo/colorfly.geo.json");
