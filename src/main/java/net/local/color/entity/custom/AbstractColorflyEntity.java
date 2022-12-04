@@ -35,24 +35,20 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
-
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Set;
 
 //Colorfly Abstract
 public abstract class AbstractColorflyEntity extends TameableEntity implements GeoEntity {
     private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
-    private static final TrackedData<Byte> SCARED;
-    private static final TrackedData<Byte> STATE;
-    private static final TrackedData<Byte> WANT;
+    private static final TrackedData<Boolean> SCARED;
     protected static final Set<Item> CAPTURE;
     static Item BOTTLE = Items.GLASS_BOTTLE;
+    int ticksSinceBlink;
+    int ticksSinceScared;
     protected AbstractColorflyEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -65,79 +61,51 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.1);
     }
 
-    // DataTracker & NBT
+    // NBT Data
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(STATE, (byte)0);
-        this.dataTracker.startTracking(SCARED, (byte)0);
-        this.dataTracker.startTracking(WANT, (byte)0);
+        this.dataTracker.startTracking(SCARED, false);
     }
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.dataTracker.set(SCARED, nbt.getByte("Scared"));
+        this.dataTracker.set(SCARED, nbt.getBoolean("Scared"));
     }
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putByte("Scared", this.dataTracker.get(SCARED));
+        nbt.putBoolean("Scared", this.dataTracker.get(SCARED));
 
     }
 
-    // Animation Factory, Controller, and Render Settings
-    private static final RawAnimation IDLE = RawAnimation.begin().thenPlay("animation.colorfly.idle");
-    private static final RawAnimation DARK = RawAnimation.begin().thenPlay("animation.colorfly.dark");
-    private static final RawAnimation WET = RawAnimation.begin().thenPlay("animation.colorfly.wet");
-    private static final RawAnimation STORM = RawAnimation.begin().thenPlay("animation.colorfly.storm");
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-
-    @Override
+    // Animation Controller and Render Settings
     public void registerControllers(AnimatableManager<?> manager) {
-        manager.addController(new AnimationController<>(this, event -> {
-            if (event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
-                if (this.random.nextInt(4) == 0) {
-                    if (this.canBlink()) {
-                        switch (this.setMorse()) {
-                            case "dark":
-                                event.getController().forceAnimationReset();
-                                event.getController().setAnimation(DARK);
-                            case "wet":
-                                event.getController().forceAnimationReset();
-                                event.getController().setAnimation(WET);
-                            case "storm":
-                                event.getController().forceAnimationReset();
-                                event.getController().setAnimation(STORM);
-                            default:
-                                event.getController().forceAnimationReset();
-                                event.getController().setAnimation(IDLE);
-                        }
-                    }
-                }
-            }
-            return PlayState.CONTINUE;
-        }));
+        manager.addController(new AnimationController<>(this,"idle_controller", event -> PlayState.STOP)
+                .triggerableAnim("idle", RawAnimation.begin().then("animation.colorfly.blink", Animation.LoopType.PLAY_ONCE)));
+        manager.addController(new AnimationController<>(this,"dark_controller", event -> PlayState.STOP)
+                .triggerableAnim("dark", RawAnimation.begin().then("animation.colorfly.blink", Animation.LoopType.PLAY_ONCE)));
+        manager.addController(new AnimationController<>(this,"wet_controller", event -> PlayState.STOP)
+                .triggerableAnim("wet", RawAnimation.begin().then("animation.colorfly.blink", Animation.LoopType.PLAY_ONCE)));
+        manager.addController(new AnimationController<>(this,"storm_controller", event -> PlayState.STOP)
+                .triggerableAnim("dark", RawAnimation.begin().then("animation.colorfly.blink", Animation.LoopType.PLAY_ONCE)));
+
     }
-
-    @Override
+    public void blinkControl() {
+        if (!this.isScared() && ticksSinceScared > 40) {
+            switch (this.setMorse()) {
+                case "dark":
+                    triggerAnim("dark_controller", "dark");
+                case "wet":
+                    triggerAnim("wet_controller", "wet");
+                case "storm":
+                    triggerAnim("storm_controller", "storm");
+                default:
+                    triggerAnim("idle_controller", "idle");
+            }
+        }
+    }
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public AnimatableInstanceCache getAnimatableInstanceCache() { return this.cache; }
-
     public boolean shouldRender(double distance) { return this.world.getClosestPlayer(this, 25) != null; }
     protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {return dimensions.height * 0.5F;}
-    public String setMorse() {
-        long time = world.getTimeOfDay() % 24000;
-        String morse = " ";
-        if ((time <= 1000 || time >= 13000)) {
-            morse = "dark";
-        } else if (this.world.isRaining()) {
-            morse = "wet";
-        } else if (this.world.isThundering()) {
-            morse = "storm";
-        }
-        return morse;
-    }
-
-    // Entity Collision Settings
-    public boolean isPushable() { return true; }
-    protected void pushAway(Entity entity) { if (entity instanceof GreenflyEntity || entity instanceof  BlueflyEntity) { super.pushAway(entity); } }
-    protected void tickCramming() {}
 
     // Interaction Code
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
@@ -153,6 +121,18 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
     }
 
     // Set & Check
+    public String setMorse() {
+        long time = world.getTimeOfDay() % 24000;
+        String morse = " ";
+        if ((time <= 1000 || time >= 13000)) {
+            morse = "dark";
+        } else if (this.world.isRaining()) {
+            morse = "wet";
+        } else if (this.world.isThundering()) {
+            morse = "storm";
+        }
+        return morse;
+    }
     public boolean canBlink () {
         long time = world.getTimeOfDay() % 24000;
         int l = WorldRenderer.getLightmapCoordinates(this.getWorld(), this.getBlockPos().up());
@@ -162,51 +142,37 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
             return false;
         }
     }
-    public boolean isScared () { return (this.dataTracker.get(SCARED) & 1) != 0; }
-    public void setScared (boolean safe) {
-        byte b = this.dataTracker.get(SCARED);
-        if (safe || this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null) {
-            if (this.random.nextInt(20) == 0) {
-                this.dataTracker.set(SCARED, (byte)(b | 1));
-            }
+    public boolean isScared() {
+        if ((this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null)) {
+            this.dataTracker.set(SCARED, true);
+            return true;
         } else {
-            this.dataTracker.set(SCARED, (byte)(b & -2));
+            this.dataTracker.set(SCARED, false);
+            return false;
         }
-    }
-    public boolean isWant () {
-        return (this.dataTracker.get(WANT) & 1) != 0;
-    }
-    public void setWant (boolean want) {
-        byte b = this.dataTracker.get(WANT);
-        if (want) {
-            this.dataTracker.set(WANT, (byte)(b | 1));
-        } else {
-            this.dataTracker.set(WANT, (byte)(b & -2));
-        }
-    }
-
-    //Static Variables
-    static {
-        CAPTURE = Sets.newHashSet(Items.GLASS_BOTTLE);
-        SCARED = DataTracker.registerData(AbstractColorflyEntity.class, TrackedDataHandlerRegistry.BYTE);
-        STATE = DataTracker.registerData(AbstractColorflyEntity.class, TrackedDataHandlerRegistry.BYTE);
-        WANT = DataTracker.registerData(AbstractColorflyEntity.class, TrackedDataHandlerRegistry.BYTE);
-        CLOSE_PLAYER_PREDICATE = TargetPredicate.createNonAttackable().setBaseMaxDistance(1);
     }
 
     // Tick
     public void tick() { super.tick(); }
     public void mobTick() {
         super.mobTick();
-        if (this.random.nextInt(100) == 1) {
-            this.setScared(false);
+        if (this.isScared()) {
+            this.ticksSinceScared = 0;
+        } else {
+            ++this.ticksSinceScared;
+        }
+        if ((this.canBlink() && (this.random.nextInt(9) == 0)) && (this.ticksSinceBlink > 40)) {
+            this.ticksSinceBlink = 0;
+            this.blinkControl();
+        } else {
+            ++this.ticksSinceBlink;
         }
     }
     public void tickMovement() {
+        super.tickMovement();
         if (this.world.getBlockState(this.getBlockPos()).getBlock() instanceof CobwebBlock) {
             this.setVelocity(this.getVelocity().multiply(0,0,0));
         }
-        super.tickMovement();
     }
 
     // Custom Goals
@@ -249,7 +215,6 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
             super(pathAwareEntity, d);
         }
 
-        @Nullable
         protected Vec3d getWanderTarget() {
             Vec3d vec3d = null;
             if (this.mob.isTouchingWater()) { vec3d = FuzzyTargeting.find(this.mob, 10, 10); }
@@ -257,7 +222,6 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
             return vec3d == null ? super.getWanderTarget() : vec3d;
         }
 
-        @Nullable
         private Vec3d locatePlantBlock() {
             BlockPos blockPos = this.mob.getBlockPos();
             BlockPos.Mutable mutable = new BlockPos.Mutable();
@@ -307,7 +271,19 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
         return 0;
     }
 
+    // Entity Collision Settings
+    public boolean isPushable() { return true; }
+    protected void pushAway(Entity entity) { if (entity instanceof GreenflyEntity || entity instanceof  BlueflyEntity) { super.pushAway(entity); } }
+    protected void tickCramming() {}
+
     // Sound
     protected SoundEvent getAmbientSound() { return null; }
     protected float getSoundVolume() { return 0.0F; }
+
+    //Static Variables
+    static {
+        CAPTURE = Sets.newHashSet(Items.GLASS_BOTTLE);
+        SCARED = DataTracker.registerData(AbstractColorflyEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        CLOSE_PLAYER_PREDICATE = TargetPredicate.createNonAttackable().setBaseMaxDistance(1);
+    }
 }

@@ -16,15 +16,11 @@ public class ModItems {
     public static final Item GREENFLY_BOTTLE = registerItem("greenfly_bottle",
             new GreenflyBottleItem(new FabricItemSettings().maxCount(16)));
     public static final Item GREENFLY_SPAWN_EGG = registerItem("greenfly_spawn_egg",
-            new SpawnEggItem(ModEntities.GREENFLY,0x959B9B, 0x85F1BC,
-                    new FabricItemSettings()));
-
+            new SpawnEggItem(ModEntities.GREENFLY,0x959B9B, 0x85F1BC, new FabricItemSettings()));
     public static final Item BLUEFLY_BOTTLE = registerItem("bluefly_bottle",
             new BlueflyBottleItem(new FabricItemSettings().maxCount(16)));
-
     public static final Item BLUEFLY_SPAWN_EGG = registerItem("bluefly_spawn_egg",
-            new SpawnEggItem(ModEntities.BLUEFLY,0x959B9B, 0x9fedf4,
-                    new FabricItemSettings()));
+            new SpawnEggItem(ModEntities.BLUEFLY,0x959B9B, 0x9fedf4, new FabricItemSettings()));
 
     //General Item Register
     private static Item registerItem(String name, Item item) {

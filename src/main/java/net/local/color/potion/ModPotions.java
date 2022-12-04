@@ -16,7 +16,7 @@ public class ModPotions {
 
     public static Potion registerPotion(String name) {
         return Registry.register(Registries.POTION, new Identifier(Colorfly.MOD_ID, name),
-                new Potion(new StatusEffectInstance(StatusEffects.GLOWING, 2400, 2, false, false, true)));
+                new Potion(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 2, false, false, true)));
     }
 
     public static void registerPotions() {

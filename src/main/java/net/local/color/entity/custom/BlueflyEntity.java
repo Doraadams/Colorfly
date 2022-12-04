@@ -14,8 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
 
-import javax.annotation.Nullable;
-
 public class BlueflyEntity extends AbstractColorflyEntity {
     private static final Ingredient TEMPT;
 
@@ -33,12 +31,13 @@ public class BlueflyEntity extends AbstractColorflyEntity {
         this.setPathfindingPenalty(PathNodeType.FENCE, -1.0F);
     }
 
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
+    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityNbt) {
         this.setSilent(true);
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
 
     // InitGoals
+    @Override
     protected void initGoals() {
         this.goalSelector.add(1, new EscapeDangerGoal(this, 1));
         this.goalSelector.add(1, new SwimGoal(this));
@@ -51,14 +50,14 @@ public class BlueflyEntity extends AbstractColorflyEntity {
         this.goalSelector.add(5, new LookAroundGoal(this));
     }
 
-    // Static
-    static {
-        TEMPT = Ingredient.ofItems(ModItems.BLUEFLY_BOTTLE);
-    }
-
     // Spawn Condition
     public static boolean canCustomSpawn(EntityType<BlueflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
         int l = world.getLightLevel(pos);
         return l <= 10 && canMobSpawn(type, world, spawnReason, pos, random);
+    }
+
+    // Static
+    static {
+        TEMPT = Ingredient.ofItems(ModItems.BLUEFLY_BOTTLE);
     }
 }

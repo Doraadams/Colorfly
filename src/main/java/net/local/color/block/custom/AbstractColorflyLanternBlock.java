@@ -31,10 +31,7 @@ public abstract class AbstractColorflyLanternBlock extends Block implements Wate
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         FluidState fluidState = ctx.getWorld().getFluidState(ctx.getBlockPos());
         Direction[] var3 = ctx.getPlacementDirections();
-        int var4 = var3.length;
-
-        for(int var5 = 0; var5 < var4; ++var5) {
-            Direction direction = var3[var5];
+        for (Direction direction : var3) {
             if (direction.getAxis() == Direction.Axis.Y) {
                 BlockState blockState = this.getDefaultState().with(HANGING, direction == Direction.UP);
                 if (blockState.canPlaceAt(ctx.getWorld(), ctx.getBlockPos())) {

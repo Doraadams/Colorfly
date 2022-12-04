@@ -18,10 +18,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
 
-import javax.annotation.Nullable;
-
 public class GreenflyEntity extends AbstractColorflyEntity {
     private static final Ingredient TEMPT;
+    private int ticksSinceStateChange;
 
     // Initialize
     public GreenflyEntity(EntityType<? extends TameableEntity> type, World worldIn) {
@@ -36,13 +35,14 @@ public class GreenflyEntity extends AbstractColorflyEntity {
         this.setPathfindingPenalty(PathNodeType.COCOA, -1.0F);
         this.setPathfindingPenalty(PathNodeType.FENCE, -1.0F);
     }
-
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
+    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityNbt) {
         this.setSilent(true);
+        this.ticksSinceStateChange = 0;
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
 
     // InitGoals
+    @Override
     protected void initGoals() {
         this.goalSelector.add(1, new EscapeDangerGoal(this, 1));
         this.goalSelector.add(1, new SwimGoal(this));
@@ -53,17 +53,6 @@ public class GreenflyEntity extends AbstractColorflyEntity {
         this.goalSelector.add(4, new AbstractColorflyEntity.ColorFlyOntoOrganicGoal(this, 1.0));
         this.goalSelector.add(4, new WanderAroundFarGoal(this, 1.0));
         this.goalSelector.add(5, new LookAroundGoal(this));
-    }
-
-    // Static
-    static {
-        TEMPT = Ingredient.ofItems(ModItems.GREENFLY_BOTTLE);
-    }
-
-    // Spawn Condition
-    public static boolean canCustomSpawn(EntityType<GreenflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
-        int l = world.getLightLevel(pos);
-        return l <= 10 && canMobSpawn(type, world, spawnReason, pos, random);
     }
 
     // Navigation && State Controller
@@ -83,16 +72,10 @@ public class GreenflyEntity extends AbstractColorflyEntity {
     public void stateControl () {
         if (!this.navigation.isIdle()) {
             if (this.onGround && !this.world.getBlockState(this.getBlockPos().down()).isAir())
-                if (this.isWant()) {
+                if (this.ticksSinceStateChange > (this.random.nextInt((100 - 5)) + 5)) {
+                    this.ticksSinceStateChange = 0;
                     this.setVelocity(this.getVelocity().getX(), -0.15, this.getVelocity().getZ());
-                    if ((this.random.nextInt(100) <= 5)) {
-                        this.setWant(false);
-                    }
                 }
-        } else {
-            if ((this.random.nextInt(100) <= 1) && this.world.getBlockState(this.getBlockPos().down()).isAir()) {
-                this.setWant(true);
-            }
         }
     }
 
@@ -100,15 +83,23 @@ public class GreenflyEntity extends AbstractColorflyEntity {
     @Override
     public void mobTick() {
         super.mobTick();
-        if (this.random.nextInt(100) == 1) {
-            this.setScared(false);
+        if (this.isScared()) {
+            this.ticksSinceScared = 0;
+        } else {
+            ++this.ticksSinceScared;
+        }
+        if ((this.canBlink() && (this.random.nextInt(9) == 0)) && (this.ticksSinceBlink > 40)) {
+            this.ticksSinceBlink = 0;
+            this.blinkControl();
+        } else {
+            ++this.ticksSinceBlink;
         }
         this.stateControl();
+        ++this.ticksSinceStateChange;
     }
     @Override
     public void tickMovement() {
         super.tickMovement();
-
         Vec3d vec3d = this.getVelocity();
         if (this.world.getBlockState(this.getBlockPos()).getBlock() instanceof CobwebBlock) {
             this.setVelocity(this.getVelocity().multiply(0,0,0));
@@ -117,5 +108,16 @@ public class GreenflyEntity extends AbstractColorflyEntity {
                 this.setVelocity(vec3d.multiply(1.0, 0.6, 1.0));
             }
         }
+    }
+
+    // Spawn Condition
+    public static boolean canCustomSpawn(EntityType<GreenflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        int l = world.getLightLevel(pos);
+        return l <= 10 && canMobSpawn(type, world, spawnReason, pos, random);
+    }
+
+    // Static
+    static {
+        TEMPT = Ingredient.ofItems(ModItems.GREENFLY_BOTTLE);
     }
 }

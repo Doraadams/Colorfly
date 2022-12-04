@@ -26,9 +26,6 @@ public class ModBlocks {
                     .luminance(state -> state.get(BlueflyLanternBlock.LIT))));
 
     //General Block Register
-    //private static Block registerBlockWithoutItem(String name, Block block) {
-    //    return Registry.register(Registries.BLOCK, new Identifier(Colorfly.MOD_ID, name), block);
-    //}
     private static Block registerBlock(String name, Block block) {
         registerBlockItem(name, block);
         return Registry.register(Registries.BLOCK, new Identifier(Colorfly.MOD_ID, name), block);
@@ -36,9 +33,6 @@ public class ModBlocks {
     private static Item registerBlockItem(String name, Block block) {
         return Registry.register(Registries.ITEM, new Identifier(Colorfly.MOD_ID, name), new BlockItem(block, new FabricItemSettings()));
     }
-    //private static Block registerBlockWithoutBlockItem(String name, Block block, ItemGroup group) {
-    //    return Registry.register(Registries.BLOCK, new Identifier(Colorfly.MOD_ID, name), block);
-    //}
     public static void registerModBlocks() {
         Colorfly.LOGGER.debug("Registering ModBlocks for " + Colorfly.MOD_ID);
     }

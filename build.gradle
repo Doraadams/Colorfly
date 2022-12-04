@@ -33,13 +33,6 @@ dependencies {
 	//noinspection GradlePackageVersionRange
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	include modApi('teamreborn:energy:2.2.0') {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-
-	modImplementation  ("curse.maven:reborncore-237903:3902448")
-	modImplementation  ("curse.maven:techreborn-233564:3902447")
-
 	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19.3-rc1:4.0.0'
 
 	// Uncomment the following line to enable the deprecated Fabric API modules.

@@ -12,7 +12,7 @@ public class BlueflyRenderer extends GeoEntityRenderer<BlueflyEntity> {
     public BlueflyRenderer(EntityRendererFactory.Context ctx) {
         super(ctx, new BlueflyModel());
         this.shadowRadius=0;
-        this.withScale(0.75F);
+        this.withScale(1.0F);
         this.addRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
 }

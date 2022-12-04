@@ -3,7 +3,6 @@ package net.local.color.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.local.color.block.ModBlocks;
-import net.local.color.block.custom.GreenflyLanternBlock;
 import net.local.color.item.ModItems;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.RecipeProvider;

@@ -12,7 +12,7 @@ public class GreenflyRenderer extends GeoEntityRenderer<GreenflyEntity> {
     public GreenflyRenderer(EntityRendererFactory.Context ctx) {
         super(ctx, new GreenflyModel());
         this.shadowRadius=0;
-        this.withScale(0.75F);
+        this.withScale(1.0F);
         this.addRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
 }
