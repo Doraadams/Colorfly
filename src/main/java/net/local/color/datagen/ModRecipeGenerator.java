@@ -13,6 +13,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.function.Consumer;
 
+// Mod Recipe DataGenerator
 public class ModRecipeGenerator extends FabricRecipeProvider {
     public ModRecipeGenerator(FabricDataOutput dataOutput) {
         super(dataOutput);
@@ -20,6 +21,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
 
     @Override
     public void generate(Consumer<RecipeJsonProvider> exporter) {
+        // Greenfly Lantern Recipe DataGenerator
         ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, ModBlocks.GREENFLY_LANTERN, 1)
                 .pattern("XXX")
                 .pattern("X#X")
@@ -32,6 +34,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                         RecipeProvider.conditionsFromItem(ModItems.GREENFLY_BOTTLE))
                 .offerTo(exporter, new Identifier(RecipeProvider.getRecipeName(ModBlocks.GREENFLY_LANTERN)));
 
+        // Bluefly Lantern Recipe DataGenerator
         ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, ModBlocks.BLUEFLY_LANTERN)
                 .pattern("XXX")
                 .pattern("X#X")

@@ -5,7 +5,7 @@ import net.local.color.entity.custom.GreenflyEntity;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib.model.GeoModel;
 
-//Bluefly Model Resource Directories/Variables
+//Greenfly Model, Texture, & Animation Resource Directories
 public class GreenflyModel extends GeoModel<GreenflyEntity> {
     @Override
     public Identifier getModelResource(GreenflyEntity object) {

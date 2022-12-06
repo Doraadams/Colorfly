@@ -5,10 +5,10 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
-// Bluefly Rendering
+// Bluefly Renderer
 public class BlueflyRenderer extends GeoEntityRenderer<BlueflyEntity> {
 
-    // Render Factory, Shadow Radius, and Emissive Initialize
+    // Renderer, Shadow Radius, & Glow Render Layer
     public BlueflyRenderer(EntityRendererFactory.Context ctx) {
         super(ctx, new BlueflyModel());
         this.shadowRadius=0;

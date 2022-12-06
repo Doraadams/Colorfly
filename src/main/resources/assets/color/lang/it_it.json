@@ -1,0 +1,16 @@
+{
+  "itemGroup.color.colorfly": "Colore",
+
+  "item.color.greenfly_spawn_egg": "Uovo di deposizione verde",
+  "item.color.bluefly_spawn_egg": "Uovo di deposizione blu",
+
+  "item.color.greenfly_bottle": "Bottiglia verde",
+  "item.color.bluefly_bottle": "Bottiglia blu",
+
+  "block.color.greenfly_lantern": "Lanterna verde",
+  "block.color.bluefly_lantern": "Lanterna blu",
+
+  "item.minecraft.potion.effect.glowing_potion": "Pozione di bagliore",
+  "item.minecraft.splash_potion.effect.glowing_potion": "Pozione di bagliore Splash",
+  "item.minecraft.lingering_potion.effect.glowing_potion": "Pozione di bagliore persistente"
+}

@@ -2,22 +2,20 @@ package net.local.color.block.custom;
 
 import net.minecraft.block.*;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
 
+// Greenfly Lantern Block
 public class BlueflyLanternBlock extends AbstractColorflyLanternBlock {
-    public static final IntProperty LIT = IntProperty.of("lit",7,12);
-
     public BlueflyLanternBlock(Settings settings) {
         super(settings);
+        // Initialize Greenfly Lantern Block Default States
         this.setDefaultState(this.getStateManager().getDefaultState()
-                .with(LIT, 12)
                 .with(HANGING, false)
                 .with(WATERLOGGED, false));
     }
 
-    //Append/Extra Code
+    //Append Properties
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(HANGING, WATERLOGGED, LIT);
+        builder.add(HANGING, WATERLOGGED);
     }
 }

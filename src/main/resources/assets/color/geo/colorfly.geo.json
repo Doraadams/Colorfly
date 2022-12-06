@@ -16,9 +16,28 @@
 					"pivot": [0, 0, 0]
 				},
 				{
+					"name": "Anim",
+					"parent": "Colorfly2",
+					"pivot": [0, 0.13125, 0.12625],
+					"cubes": [
+						{
+							"origin": [-0.12625, 0.005, 0],
+							"size": [0.2525, 0.2525, 0.2525],
+							"uv": {
+								"north": {"uv": [3, 0], "uv_size": [1, 1]},
+								"east": {"uv": [0, 3], "uv_size": [1, 1]},
+								"south": {"uv": [1, 2], "uv_size": [1, 1]},
+								"west": {"uv": [2, 2], "uv_size": [1, 1]},
+								"up": {"uv": [3, 2], "uv_size": [-1, -1]},
+								"down": {"uv": [3, 1], "uv_size": [-1, -1]}
+							}
+						}
+					]
+				},
+				{
 					"name": "Body",
 					"parent": "Colorfly2",
-					"pivot": [0, 0, 0],
+					"pivot": [0, 0.13125, 0],
 					"cubes": [
 						{
 							"origin": [-0.125, 0.00625, -0.25],
@@ -41,25 +60,6 @@
 								"west": {"uv": [0, 2], "uv_size": [1, -1]},
 								"up": {"uv": [1, 0], "uv_size": [-1, 1]},
 								"down": {"uv": [2, 1], "uv_size": [-1, -1]}
-							}
-						}
-					]
-				},
-				{
-					"name": "Anim",
-					"parent": "Body",
-					"pivot": [0, 0, 0],
-					"cubes": [
-						{
-							"origin": [-0.12625, 0.005, 0],
-							"size": [0.2525, 0.2525, 0.2525],
-							"uv": {
-								"north": {"uv": [3, 0], "uv_size": [1, 1]},
-								"east": {"uv": [0, 3], "uv_size": [1, 1]},
-								"south": {"uv": [1, 2], "uv_size": [1, 1]},
-								"west": {"uv": [2, 2], "uv_size": [1, 1]},
-								"up": {"uv": [3, 2], "uv_size": [-1, -1]},
-								"down": {"uv": [3, 1], "uv_size": [-1, -1]}
 							}
 						}
 					]

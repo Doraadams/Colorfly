@@ -1,0 +1,16 @@
+{
+  "itemGroup.color.colorfly": "색깔",
+
+  "item.color.greenfly_spawn_egg": "녹색 산란 알",
+  "item.color.bluefly_spawn_egg": "파란색 산란 계란",
+
+  "item.color.greenfly_bottle": "녹색 병",
+  "item.color.bluefly_bottle": "블루보틀",
+
+  "block.color.greenfly_lantern": "그린 랜턴",
+  "block.color.bluefly_lantern": "블루 랜턴",
+
+  "item.minecraft.potion.effect.glowing_potion": "글로우 포션",
+  "item.minecraft.splash_potion.effect.glowing_potion": "스플래쉬 글로우 포션",
+  "item.minecraft.lingering_potion.effect.glowing_potion": "오래가는 빛의 물약"
+}

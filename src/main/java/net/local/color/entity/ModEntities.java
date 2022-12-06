@@ -11,23 +11,23 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
+//Entity Creation & Settings
 public class ModEntities {
-
-    //Colorfly Entity Creation, Hitbox, & Other.
     public static final EntityType<GreenflyEntity> GREENFLY = Registry.register(
             Registries.ENTITY_TYPE, new Identifier(Colorfly.MOD_ID, "greenfly"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, GreenflyEntity::new)
                     .spawnableFarFromPlayer()
-                    .trackRangeBlocks(64)
+                    .trackRangeBlocks(30)
+                    // Hitbox Size
                     .dimensions(EntityDimensions.fixed(0.0475f,0.0375f))
                     .fireImmune()
                     .build());
-
     public static final EntityType<BlueflyEntity> BLUEFLY = Registry.register(
             Registries.ENTITY_TYPE, new Identifier(Colorfly.MOD_ID, "bluefly"),
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, BlueflyEntity::new)
                     .spawnableFarFromPlayer()
-                    .trackRangeBlocks(64)
+                    .trackRangeBlocks(30)
+                    // Hitbox Size
                     .dimensions(EntityDimensions.fixed(0.0625f,0.0625f))
                     .fireImmune()
                     .build());

@@ -14,24 +14,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.bernie.geckolib.GeckoLib;
 
-//Initialize Colorfly
+// Initialize Colorfly Mod
 public class Colorfly implements ModInitializer {
 	public static final String MOD_ID = "color";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	//On Initialize, Register Needed
 	@Override
 	public void onInitialize() {
+		// Initialize Geckolib
 		GeckoLib.initialize();
 
+		// Register Mod Items, Blocks, Item Groups, & Vanilla Item Group Additions
 		ModItems.registerModItems();
 		ModBlocks.registerModBlocks();
 		ModItemGroup.registerModItemGroup();
 
+		// Register Mod Potions
 		ModPotions.registerPotions();
 
+		// Register Mod Entity Custom Spawn Conditions
 		ModEntitySpawn.addEntitySpawn();
 
+		// Register Colorfly Entity Attributes
 		FabricDefaultAttributeRegistry.register(ModEntities.GREENFLY, GreenflyEntity.setAttributes());
 		FabricDefaultAttributeRegistry.register(ModEntities.BLUEFLY, BlueflyEntity.setAttributes());
 	}

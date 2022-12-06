@@ -11,22 +11,20 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
+// Register Glowing Potion
 public class ModPotions {
     public static Potion GLOWING_POTION;
-
     public static Potion registerPotion(String name) {
         return Registry.register(Registries.POTION, new Identifier(Colorfly.MOD_ID, name),
-                new Potion(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 2, false, false, true)));
+                new Potion(new StatusEffectInstance(
+                        StatusEffects.GLOWING, 1200, 2, false, false, true)));
     }
-
     public static void registerPotions() {
         GLOWING_POTION = registerPotion("glowing_potion");
-
         registerPotionRecipes();
     }
-
+    // Register Glowing Potion Recipe
     private static void registerPotionRecipes() {
-        BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.AWKWARD, ModItems.GREENFLY_BOTTLE,
-                ModPotions.GLOWING_POTION);
+        BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.AWKWARD, ModItems.GREENFLY_BOTTLE, ModPotions.GLOWING_POTION);
     }
 }

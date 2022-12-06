@@ -1,0 +1,16 @@
+{
+  "itemGroup.color.colorfly": "Couleur",
+
+  "item.color.greenfly_spawn_egg": "Oeuf de spawn vert",
+  "item.color.bluefly_spawn_egg": "Oeuf de ponte bleu",
+
+  "item.color.greenfly_bottle": "Bouteille verte",
+  "item.color.bluefly_bottle": "Bouteille bleue",
+
+  "block.color.greenfly_lantern": "Lanterne verte",
+  "block.color.bluefly_lantern": "Lanterne bleue",
+
+  "item.minecraft.potion.effect.glowing_potion": "Potion lumineuse",
+  "item.minecraft.splash_potion.effect.glowing_potion": "Potion incandescente Splash",
+  "item.minecraft.lingering_potion.effect.glowing_potion": "Potion lumineuse persistante"
+}
