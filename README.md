@@ -1,11 +1,11 @@
+<div align="center">
 
 ![header](https://i.imgur.com/rg1auOp.png)
-<center>
 
 ![Java 17](https://img.shields.io/badge/Language-Java%2017-9B599A.svg?style=plastic)
 ![License](https://img.shields.io/github/license/Doraadams/Colorfly?style=plastic)
 [![Mod loader: Fabric](https://img.shields.io/badge/modloader-Fabric-1976d2?style=plastic)](https://fabricmc.net) [![Requires_Geckolib](https://img.shields.io/badge/Requires-Geckolib-brightgreen?style=plastic)](https://github.com/bernie-g/geckolib)
-</center>
+</div>
 
 # Colorfly
 #### Mojang shouldn't have removed fireflies... Why not add them back, but better?
@@ -33,11 +33,11 @@
 -- **Colorflies don't like Spiders, and Spiders don't like Colorflies. Colorflies also don't like Frogs, but *thankfully* Frogs couldn't care less.**
 
 ## Screenshots & Gifs
-<center>
+<div align="center">
 
-![Image2](https://i.imgur.com/4l5rYH6.gif)\
-![Image1](https://i.imgur.com/JDPSFDg.png)\
+![Image1](https://i.imgur.com/4l5rYH6.gif)\
+![Image2](https://i.imgur.com/JDPSFDg.png)\
 ![Image3](https://i.imgur.com/EaWEs3G.png)\
 ![Image4](https://i.imgur.com/UfObDiS.png)
 #### *Screenshots & Gifs taken using Complementary Shaders v4*
-</center>
+</div>
