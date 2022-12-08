@@ -9,15 +9,16 @@ import net.local.color.entity.client.BlueflyRenderer;
 import net.local.color.entity.client.GreenflyRenderer;
 import net.minecraft.client.render.RenderLayer;
 
-//Colorfly Client Initialize
+// Colorfly Client Initialize
 public class ColorflyClient implements ClientModInitializer {
 
-    //On Initialize, Register Entity || Translucent Block Model Layer
     @Override
     public void onInitializeClient() {
+        // Initialize Colorfly Entities
         EntityRendererRegistry.register(ModEntities.GREENFLY, GreenflyRenderer::new);
         EntityRendererRegistry.register(ModEntities.BLUEFLY, BlueflyRenderer::new);
 
+        // Initialize Colorfly Lantern Translucent Block Render Layer
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.GREENFLY_LANTERN, RenderLayer.getTranslucent());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.BLUEFLY_LANTERN, RenderLayer.getTranslucent());
     }

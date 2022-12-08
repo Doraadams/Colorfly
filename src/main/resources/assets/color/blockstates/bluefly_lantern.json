@@ -1,6 +1,0 @@
-{
-  "variants": {
-    "hanging=false": { "model": "color:block/bluefly_lantern" },
-    "hanging=true": { "model": "color:block/bluefly_lantern_hanging" }
-  }
-}

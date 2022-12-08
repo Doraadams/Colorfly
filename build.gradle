@@ -33,14 +33,7 @@ dependencies {
 	//noinspection GradlePackageVersionRange
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	include modApi('teamreborn:energy:2.2.0') {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-
-	modImplementation  ("curse.maven:reborncore-237903:3902448")
-	modImplementation  ("curse.maven:techreborn-233564:3902447")
-
-	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19:3.1.22'
+	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19.3:4.0.0'
 
 	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
@@ -55,6 +48,24 @@ processResources {
 		expand "version": project.version
 	}
 }
+
+def dataOutput = 'src/main/generated'
+
+loom {
+	runs {
+		datagen {
+			server()
+
+			name "Data Generation"
+			vmArg "-Dfabric-api.datagen"
+			vmArg "-Dfabric-api.datagen.output-dir=${file(dataOutput)}"
+
+			runDir "build/datagen"
+		}
+	}
+}
+
+sourceSets { main {resources { srcDirs += dataOutput} } }
 
 tasks.withType(JavaCompile).configureEach {
 	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.

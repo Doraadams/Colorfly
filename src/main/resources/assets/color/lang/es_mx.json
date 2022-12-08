@@ -1,0 +1,16 @@
+{
+  "itemGroup.color.colorfly": "Color",
+
+  "item.color.greenfly_spawn_egg": "Huevo de desove verde",
+  "item.color.bluefly_spawn_egg": "Huevo de desove azul",
+
+  "item.color.greenfly_bottle": "Botella verde",
+  "item.color.bluefly_bottle": "Botella azul",
+
+  "block.color.greenfly_lantern": "Linterna verde",
+  "block.color.bluefly_lantern": "Linterna azul",
+
+  "item.minecraft.potion.effect.glowing_potion": "Poción de resplandor",
+  "item.minecraft.splash_potion.effect.glowing_potion": "Poción de resplandor de salpicadura",
+  "item.minecraft.lingering_potion.effect.glowing_potion": "Poción de resplandor persistente"
+}

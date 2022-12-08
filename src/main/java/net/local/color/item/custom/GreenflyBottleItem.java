@@ -14,14 +14,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import java.util.Objects;
 
-//Greenfly Bottle
+// Greenfly Bottle
 public class GreenflyBottleItem extends Item {
 
     public GreenflyBottleItem(Settings settings) {
         super(settings);
     }
 
-    //Interaction | Release Stored Bluefly
+    // Release Stored Greenfly
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         World world = context.getWorld();

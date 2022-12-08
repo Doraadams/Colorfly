@@ -1,0 +1,16 @@
+{
+  "itemGroup.color.colorfly": "Цвет",
+
+  "item.color.greenfly_spawn_egg": "Зеленая икринка",
+  "item.color.bluefly_spawn_egg": "Синее икринное яйцо",
+
+  "item.color.greenfly_bottle": "Зеленая бутылка",
+  "item.color.bluefly_bottle": "Синяя бутылка",
+
+  "block.color.greenfly_lantern": "Зеленый фонарь",
+  "block.color.bluefly_lantern": "Синий фонарь",
+
+  "item.minecraft.potion.effect.glowing_potion": "Светящееся зелье",
+  "item.minecraft.splash_potion.effect.glowing_potion": "Зелье свечения всплеска",
+  "item.minecraft.lingering_potion.effect.glowing_potion": "Приворотное зелье"
+}

@@ -1,0 +1,16 @@
+{
+  "itemGroup.color.colorfly": "カラー",
+
+  "item.color.greenfly_spawn_egg": "グリーンスポーンエッグ",
+  "item.color.bluefly_spawn_egg": "ブルー・スポーンエッグ",
+
+  "item.color.greenfly_bottle": "グリーンボトル",
+  "item.color.bluefly_bottle": "ブルーボトル",
+
+  "block.color.greenfly_lantern": "グリーンランタン",
+  "block.color.bluefly_lantern": "ブルーランタン",
+
+  "item.minecraft.potion.effect.glowing_potion": "グローポーション",
+  "item.minecraft.splash_potion.effect.glowing_potion": "スプラッシュグローポーション",
+  "item.minecraft.lingering_potion.effect.glowing_potion": "残光ポーション"
+}

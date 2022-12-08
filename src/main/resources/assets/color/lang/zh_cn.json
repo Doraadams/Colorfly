@@ -1,12 +1,16 @@
 {
+  "itemGroup.color.colorfly": "颜色",
+
   "item.color.greenfly_spawn_egg": "绿色产卵蛋",
   "item.color.bluefly_spawn_egg": "蓝色产卵蛋",
 
-  "item.color.greenfly_bottle": "绿色彩色瓶子",
-  "item.color.bluefly_bottle": "蓝色彩色瓶子",
+  "item.color.greenfly_bottle": "绿瓶",
+  "item.color.bluefly_bottle": "蓝瓶",
 
-  "block.color.greenfly_lantern": "绿色灯笼",
+  "block.color.greenfly_lantern": "绿灯笼",
   "block.color.bluefly_lantern": "蓝灯笼",
 
-  "itemGroup.color.colorfly": "彩色标签页"
+  "item.minecraft.potion.effect.glowing_potion": "辉光药水",
+  "item.minecraft.splash_potion.effect.glowing_potion": "飞溅的光辉药水",
+  "item.minecraft.lingering_potion.effect.glowing_potion": "挥之不去的光辉药水"
 }

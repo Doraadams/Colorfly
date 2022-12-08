@@ -1,7 +1,0 @@
-{
-	"parent": "color:block/colorfly_lantern",
-	"textures": {
-		"2": "color:block/bluefly_lantern",
-		"particle": "color:block/bluefly_lantern"
-	}
-}
