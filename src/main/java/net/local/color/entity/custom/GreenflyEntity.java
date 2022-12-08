@@ -18,7 +18,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
 
 // Greenfly Entity
@@ -30,18 +29,22 @@ public class GreenflyEntity extends AbstractColorflyEntity {
     public GreenflyEntity(EntityType<? extends TameableEntity> type, World worldIn) {
         super(type, worldIn);
         this.ignoreCameraFrustum = true;
-        this.moveControl = new FlightMoveControl(this, 0, true);
         this.lookControl = new ColorflyLookControl(this);
+        this.moveControl = new FlightMoveControl(this, 0, true);
         this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, -1.0F);
         this.setPathfindingPenalty(PathNodeType.WATER, -1.0F);
         this.setPathfindingPenalty(PathNodeType.WATER_BORDER, 16.0F);
         this.setPathfindingPenalty(PathNodeType.COCOA, -1.0F);
         this.setPathfindingPenalty(PathNodeType.FENCE, -1.0F);
     }
+
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityNbt) {
         this.setSilent(true);
         this.ticksSinceStateChange = 0;
         this.ticksAnimDelay = 0;
+        if (spawnReason == SpawnReason.BUCKET) {
+            this.setFromBottle(true);
+        }
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt);
     }
 
@@ -66,16 +69,9 @@ public class GreenflyEntity extends AbstractColorflyEntity {
             itemStack.decrement(1);
             this.remove(RemovalReason.DISCARDED);
             player.giveItemStack(new ItemStack(ModItems.GREENFLY_BOTTLE, 1));
-
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);
-    }
-
-    // Spawn Condition
-    public static boolean canCustomSpawn(EntityType<GreenflyEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
-        int l = world.getLightLevel(pos);
-        return l <= 10 && canMobSpawn(type, world, spawnReason, pos, random);
     }
 
     // Navigation && State Controller

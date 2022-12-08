@@ -33,7 +33,7 @@ dependencies {
 	//noinspection GradlePackageVersionRange
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19.3-rc1:4.0.0'
+	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19.3:4.0.0'
 
 	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

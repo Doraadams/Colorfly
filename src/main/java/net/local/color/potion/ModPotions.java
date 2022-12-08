@@ -26,5 +26,6 @@ public class ModPotions {
     // Register Glowing Potion Recipe
     private static void registerPotionRecipes() {
         BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.AWKWARD, ModItems.GREENFLY_BOTTLE, ModPotions.GLOWING_POTION);
+        BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.AWKWARD, ModItems.BLUEFLY_BOTTLE, ModPotions.GLOWING_POTION);
     }
 }

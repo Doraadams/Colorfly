@@ -1,5 +1,7 @@
 package net.local.color.entity.custom;
 
+import com.google.common.collect.Sets;
+import net.local.color.util.ModTags;
 import net.minecraft.block.*;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.*;
@@ -21,12 +23,9 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import org.apache.commons.compress.utils.Sets;
+import net.minecraft.util.math.*;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.*;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
@@ -39,15 +38,14 @@ import java.util.Objects;
 import java.util.Set;
 
 // Colorfly Abstract
-@SuppressWarnings("EmptyMethod")
 public abstract class AbstractColorflyEntity extends TameableEntity implements GeoEntity {
     private static final TargetPredicate CLOSE_PLAYER_PREDICATE;
     private static final TargetPredicate CLOSE_ENTITY_PREDICATE;
+    private static final TrackedData<Boolean> FROM_BOTTLE;
     private static final TrackedData<Boolean> SCARED;
     protected static final Set<Item> CAPTURE;
     protected int ticksAnimDelay;
     protected int ticksSinceScared;
-    private String morse;
 
     protected AbstractColorflyEntity(EntityType<? extends TameableEntity> entityType, World world) { super(entityType, world); }
 
@@ -63,85 +61,86 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(SCARED, false);
+        this.dataTracker.startTracking(FROM_BOTTLE, false);
     }
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(SCARED, nbt.getBoolean("Scared"));
+        this.setFromBottle(nbt.getBoolean("FromBottle"));
     }
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putBoolean("Scared", this.dataTracker.get(SCARED));
+        nbt.putBoolean("FromBottle", this.isFromBottle());
     }
 
     // Animation Controller & Render Settings
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-
+    @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() { return this.cache; }
-
-    public void registerControllers(AnimatableManager<?> manager) {
-        manager.addController(new AnimationController<>(this, event -> {
-            event.getController().setAnimation(RawAnimation.begin().then("animation.colorfly.idle", Animation.LoopType.PLAY_ONCE));
-            return PlayState.CONTINUE;
-        }));
-        manager.addController(new AnimationController<>(this, "sos_controller", event -> PlayState.STOP)
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar manager) {
+        manager.add(new AnimationController<>(this, "idle_controller", event -> PlayState.STOP)
+                .triggerableAnim("idle", RawAnimation.begin().then("animation.colorfly.idle", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
+        manager.add(new AnimationController<>(this, "sos_controller", event -> PlayState.STOP)
                 .triggerableAnim("sos", RawAnimation.begin().then("animation.colorfly.sos", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "human_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "human_controller", event -> PlayState.STOP)
                 .triggerableAnim("human", RawAnimation.begin().then("animation.colorfly.human", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "dark_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "dark_controller", event -> PlayState.STOP)
                 .triggerableAnim("dark", RawAnimation.begin().then("animation.colorfly.dark", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "wet_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "wet_controller", event -> PlayState.STOP)
                 .triggerableAnim("wet", RawAnimation.begin().then("animation.colorfly.wet", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "storm_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "storm_controller", event -> PlayState.STOP)
                 .triggerableAnim("storm", RawAnimation.begin().then("animation.colorfly.storm", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "fairy_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "fairy_controller", event -> PlayState.STOP)
                 .triggerableAnim("fairy", RawAnimation.begin().then("animation.colorfly.fairy", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "bat_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "bat_controller", event -> PlayState.STOP)
                 .triggerableAnim("bat", RawAnimation.begin().then("animation.colorfly.bat", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "camel_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "camel_controller", event -> PlayState.STOP)
                 .triggerableAnim("camel", RawAnimation.begin().then("animation.colorfly.camel", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "cat_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "cat_controller", event -> PlayState.STOP)
                 .triggerableAnim("cat", RawAnimation.begin().then("animation.colorfly.cat", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "fowl_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "fowl_controller", event -> PlayState.STOP)
                 .triggerableAnim("fowl", RawAnimation.begin().then("animation.colorfly.fowl", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "cow_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "cow_controller", event -> PlayState.STOP)
                 .triggerableAnim("cow", RawAnimation.begin().then("animation.colorfly.cow", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "fox_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "fox_controller", event -> PlayState.STOP)
                 .triggerableAnim("fox", RawAnimation.begin().then("animation.colorfly.fox", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "frog_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "frog_controller", event -> PlayState.STOP)
                 .triggerableAnim("frog", RawAnimation.begin().then("animation.colorfly.frog", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "steed_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "steed_controller", event -> PlayState.STOP)
                 .triggerableAnim("steed", RawAnimation.begin().then("animation.colorfly.steed", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "mule_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "mule_controller", event -> PlayState.STOP)
                 .triggerableAnim("mule", RawAnimation.begin().then("animation.colorfly.mule", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "bird_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "bird_controller", event -> PlayState.STOP)
                 .triggerableAnim("bird", RawAnimation.begin().then("animation.colorfly.bird", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "pig_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "pig_controller", event -> PlayState.STOP)
                 .triggerableAnim("pig", RawAnimation.begin().then("animation.colorfly.pig", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "hare_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "hare_controller", event -> PlayState.STOP)
                 .triggerableAnim("hare", RawAnimation.begin().then("animation.colorfly.hare", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "sheep_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "sheep_controller", event -> PlayState.STOP)
                 .triggerableAnim("sheep", RawAnimation.begin().then("animation.colorfly.sheep", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "frosty_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "frosty_controller", event -> PlayState.STOP)
                 .triggerableAnim("frosty", RawAnimation.begin().then("animation.colorfly.frosty", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "crush_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "crush_controller", event -> PlayState.STOP)
                 .triggerableAnim("crush", RawAnimation.begin().then("animation.colorfly.crush", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "squid_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "squid_controller", event -> PlayState.STOP)
                 .triggerableAnim("squid", RawAnimation.begin().then("animation.colorfly.squid", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "bee_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "bee_controller", event -> PlayState.STOP)
                 .triggerableAnim("bee", RawAnimation.begin().then("animation.colorfly.bee", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "goat_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "goat_controller", event -> PlayState.STOP)
                 .triggerableAnim("goat", RawAnimation.begin().then("animation.colorfly.goat", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "fe_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "fe_controller", event -> PlayState.STOP)
                 .triggerableAnim("fe", RawAnimation.begin().then("animation.colorfly.fe", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "llama_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "llama_controller", event -> PlayState.STOP)
                 .triggerableAnim("llama", RawAnimation.begin().then("animation.colorfly.llama", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "po_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "po_controller", event -> PlayState.STOP)
                 .triggerableAnim("po", RawAnimation.begin().then("animation.colorfly.po", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "bear_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "bear_controller", event -> PlayState.STOP)
                 .triggerableAnim("bear", RawAnimation.begin().then("animation.colorfly.bear", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "wolf_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "wolf_controller", event -> PlayState.STOP)
                 .triggerableAnim("wolf", RawAnimation.begin().then("animation.colorfly.wolf", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
-        manager.addController(new AnimationController<>(this, "glow_controller", event -> PlayState.STOP)
+        manager.add(new AnimationController<>(this, "glow_controller", event -> PlayState.STOP)
                 .triggerableAnim("glow", RawAnimation.begin().then("animation.colorfly.glow", Animation.LoopType.PLAY_ONCE)).setAnimationSpeed(1.25));
     }
     public void blinkController() {
@@ -262,17 +261,22 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
                 triggerAnim("wolf_controller", "wolf");
                 this.ticksAnimDelay = 740;
             }
-            case "Greenfly", "Bluefly" -> {
+            case "Greenfly", "Bluefly", "Colorfly"-> {
                 triggerAnim("glow_controller", "glow");
                 this.ticksAnimDelay = 720;
             }
-            default -> this.ticksAnimDelay = 0;
+            default ->  {
+                triggerAnim("idle_controller", "idle");
+                this.ticksAnimDelay = 0;
+            }
         }
     }
-    public boolean shouldRender(double distance) { return true; }
-    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) { return dimensions.height * 0.5F; }
 
-    // Set, Check, & Morse Code
+    // Set & Check
+    public void setFromBottle(boolean fromBottle) {
+        this.dataTracker.set(FROM_BOTTLE, fromBottle);
+    }
+    public boolean isFromBottle() { return this.dataTracker.get(FROM_BOTTLE); }
     public boolean isScared() {
         if ((this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null)) {
             this.dataTracker.set(SCARED, true);
@@ -282,32 +286,33 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
             return false;
         }
     }
+
+    // Morse Code
     public String setBlink() {
         long time = world.getTimeOfDay() % 24000;
-        if (this.world.getBlockState(this.getBlockPos()).getBlock() instanceof CobwebBlock) {
-            this.morse = "SOS";
-            return this.morse;
-        }
-        if (this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null) {
-            this.morse = "Human";
-            return this.morse;
-        }
-        if (world.getClosestEntity(PathAwareEntity.class, CLOSE_ENTITY_PREDICATE, this, this.getX(), this.getY(), this.getZ(), this.getBoundingBox().expand(20)) != null) {
-            this.morse = Objects.requireNonNull(world.getClosestEntity(PathAwareEntity.class, CLOSE_ENTITY_PREDICATE, this, this.getX(), this.getY(), this.getZ(), this.getBoundingBox().expand(20))).toString().split("Entity")[0];
-            return this.morse;
-        }
-        if (this.world.isRaining() || this.world.isWater(this.getBlockPos())) {
-            if (this.world.isThundering()) {
-                this.morse = "Storm";
+        String morse = "Colorfly";
+        if (world.getClosestEntity(PathAwareEntity.class, CLOSE_ENTITY_PREDICATE, this, this.getX(), this.getY(), this.getZ(), this.getBoundingBox().expand(10)) != null) {
+            if (this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, this) != null || this.world.getBlockState(this.getBlockPos()).getBlock() instanceof CobwebBlock) {
+                //this.morse = "Human";
+                morse = "SOS";
             } else {
-                this.morse = "Wet";
+                morse = Objects.requireNonNull(world.getClosestEntity(PathAwareEntity.class, CLOSE_ENTITY_PREDICATE, this, this.getX(), this.getY(), this.getZ(), this.getBoundingBox().expand(20))).toString();
+                morse = morse.split("Entity")[0];
             }
-            return this.morse;
+        } else {
+            if ((time <= 1000 || time >= 13000)) {
+                if (this.world.isRaining()) {
+                    if (this.world.isThundering()) {
+                        morse = "Storm";
+                    } else {
+                        morse = "Wet";
+                    }
+                } else {
+                    morse = "Dark";
+                }
+            }
         }
-        if ((time <= 1000 || time >= 13000)) {
-            this.morse = "Dark";
-        }
-        return this.morse;
+        return morse;
     }
     public boolean canBlink() {
         long time = world.getTimeOfDay() % 24000;
@@ -320,6 +325,7 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
     }
 
     // Tick
+    @SuppressWarnings("EmptyMethod")
     public void tick() { super.tick(); }
     public void mobTick() {
         super.mobTick();
@@ -373,7 +379,6 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
             super.start();
         }
     }
-
     static class ColorflyLookControl extends LookControl {
         ColorflyLookControl(MobEntity entity) {
             super(entity);
@@ -389,7 +394,6 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
             return true;
         }
     }
-
     static class ColorFlyOntoOrganicGoal extends FlyGoal {
         public ColorFlyOntoOrganicGoal(PathAwareEntity pathAwareEntity, double d) {
             super(pathAwareEntity, d);
@@ -441,6 +445,8 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
     // Damage
     public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) { return false; }
 
+    protected void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition) {}
+
     public boolean damage(DamageSource source, float amount) {
         if (this.isInvulnerableTo(source)) {
             return false;
@@ -450,26 +456,57 @@ public abstract class AbstractColorflyEntity extends TameableEntity implements G
     }
 
     // Entity Settings
+    @Nullable
     public PassiveEntity createChild(ServerWorld world, PassiveEntity entity) { return null; }
-
-    protected void fall(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition) {}
     @Override
     public boolean canBeLeashedBy(PlayerEntity player) { return false; }
+    public boolean canBreatheInWater() {
+        return true;
+    }
     public boolean canAvoidTraps() { return true; }
     public int getXpToDrop() { return 0; }
+
+    // Render Settings
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) { return dimensions.height * 0.5F; }
+    public boolean shouldRender(double distance) { return true; }
+
+    // Collision Settings
     protected void pushAway(Entity entity) { if (entity instanceof GreenflyEntity || entity instanceof BlueflyEntity) { super.pushAway(entity); }}
+    public boolean isPushedByFluids() {
+        return false;
+    }
     public boolean isPushable() { return false; }
     protected void tickCramming() {}
+
+    // Sound Settings
+    @Nullable
+    protected SoundEvent getHurtSound(DamageSource source) { return null; }
     @Nullable
     protected SoundEvent getAmbientSound() { return null; }
-    protected SoundEvent getHurtSound(DamageSource source) { return null; }
-    protected float getSoundVolume() { return 0; }
+    protected float getSoundVolume() { return 0.0F; }
+
+    // Spawn Condition
+    public static boolean isDark(ServerWorldAccess world) {
+        long time = world.getLunarTime() % 24000;
+        return time <= 1000 || time >= 13000;
+    }
+    public boolean cannotDespawn() { return super.cannotDespawn() || this.isFromBottle(); }
+    public boolean canImmediatelyDespawn(double distanceSquared) { return !this.hasCustomName() && !this.isFromBottle(); }
+    public static boolean canSpawn(EntityType<? extends LivingEntity> type, ServerWorldAccess world, SpawnReason reason, BlockPos pos, Random random) {
+        BlockPos blockPos = pos.down();
+        if (!isDark(world)) {
+            return false;
+        } else {
+            return (reason == SpawnReason.SPAWNER || world.getBlockState(blockPos).isIn(ModTags.COLORFLY_SPAWNABLE_ON));
+        }
+    }
 
     //Static Variables
     static {
         CAPTURE = Sets.newHashSet(Items.GLASS_BOTTLE);
-        SCARED = DataTracker.registerData(AbstractColorflyEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         CLOSE_PLAYER_PREDICATE = TargetPredicate.createNonAttackable().setBaseMaxDistance(1);
         CLOSE_ENTITY_PREDICATE = TargetPredicate.createNonAttackable().setBaseMaxDistance(1);
+        SCARED = DataTracker.registerData(AbstractColorflyEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+        FROM_BOTTLE = DataTracker.registerData(AbstractColorflyEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     }
 }

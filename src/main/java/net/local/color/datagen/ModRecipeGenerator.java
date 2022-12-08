@@ -35,7 +35,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .offerTo(exporter, new Identifier(RecipeProvider.getRecipeName(ModBlocks.GREENFLY_LANTERN)));
 
         // Bluefly Lantern Recipe DataGenerator
-        ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, ModBlocks.BLUEFLY_LANTERN)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, ModBlocks.BLUEFLY_LANTERN, 1)
                 .pattern("XXX")
                 .pattern("X#X")
                 .pattern("XXX")
